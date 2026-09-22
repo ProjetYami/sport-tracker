@@ -1,293 +1,75 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sport Tracker — PPL 12 semaines</title>
-<style>
-:root{
-  --bg:#f3f8f7;--surface:#fff;--surface2:#f7fbfa;--text:#16262b;--muted:#6b7d83;
-  --line:#dbe8e5;--primary:#16a995;--primary2:#0b8174;--blue:#3c8fe8;--red:#e9626d;
-  --green:#35b878;--orange:#ee9b43;--shadow:0 10px 30px rgba(27,70,65,.08);--r:18px
-}
-body.dark{
-  --bg:#0c1719;--surface:#132124;--surface2:#182a2d;--text:#edf7f5;--muted:#9eb0b2;
-  --line:#294144;--primary:#35c5b1;--primary2:#55d5c3;--shadow:0 12px 35px rgba(0,0,0,.25)
-}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;padding-bottom:92px;background:linear-gradient(180deg,var(--bg),var(--surface2));color:var(--text);
-font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.45;transition:.2s}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-header{position:sticky;top:0;z-index:20;padding:17px 16px 13px;background:color-mix(in srgb,var(--bg) 92%,transparent);
-backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-h1{margin:0;font-size:22px;letter-spacing:-.4px}.sub{color:var(--muted);font-size:12px;margin-top:3px}
-nav{position:fixed;left:9px;right:9px;bottom:9px;z-index:50;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:7px;
-background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:22px;box-shadow:0 15px 38px #0002;backdrop-filter:blur(18px)}
-nav button{border:0;border-radius:15px;padding:7px 2px;background:transparent;color:var(--muted);font-size:9px;font-weight:800;line-height:1.25}
-nav button.active{background:color-mix(in srgb,var(--primary) 14%,var(--surface));color:var(--primary2)}
-main{width:100%;max-width:590px;margin:auto;padding:14px 14px 25px}.view{display:none}.view.active{display:block}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px;box-shadow:var(--shadow)}
-.hero{background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 14%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--primary) 25%,var(--line));border-radius:22px;padding:17px;margin-bottom:12px;box-shadow:var(--shadow)}
-h2{font-size:18px;letter-spacing:-.2px}h3{font-size:14px}.stat{font-size:25px;font-weight:850;letter-spacing:-.8px}
-.muted,.note{color:var(--muted)}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);font-size:10px;font-weight:750;margin:2px}
-.push{border-left:4px solid var(--red)}.pull{border-left:4px solid var(--blue)}.legs{border-left:4px solid var(--green)}
-.daygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.day{min-height:96px;padding:11px;border-radius:15px;background:var(--surface2);border:1px solid var(--line)}
-.day b{display:block;font-size:13px}.day small{color:var(--muted);font-size:11px}.day p{font-size:11px;margin-bottom:0;color:var(--muted)}
-.day.push{background:color-mix(in srgb,var(--red) 7%,var(--surface))}.day.pull{background:color-mix(in srgb,var(--blue) 7%,var(--surface))}
-.day.legs{background:color-mix(in srgb,var(--green) 7%,var(--surface))}.day.cardio{background:color-mix(in srgb,var(--primary) 7%,var(--surface))}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;color:var(--muted);font-size:11px;font-weight:750;margin:0 0 5px}
-input,select,textarea{width:100%;color:var(--text);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px;outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 14%,transparent)}
-.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.btn{border:0;border-radius:12px;padding:10px 13px;background:var(--surface2);color:var(--text);font-weight:750}
-.btn.primary{background:var(--primary);color:#fff}.btn.blue{background:color-mix(in srgb,var(--blue) 13%,var(--surface));color:var(--blue)}
-.btn.green{background:color-mix(in srgb,var(--green) 13%,var(--surface));color:var(--green)}.btn.danger{background:color-mix(in srgb,var(--red) 12%,var(--surface));color:var(--red)}
-.exercise{margin-top:10px}.exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.exercise h3{margin:0 0 4px}
-.prev{font-size:11px;color:var(--primary2);font-weight:750;margin:5px 0 7px}.sets{display:grid;grid-template-columns:27px 1fr 1fr 1fr 31px;gap:5px;align-items:center}
-.sets>div{color:var(--muted);font-size:9px;font-weight:750}.sets input{padding:8px;font-size:12px}.done{width:22px;height:22px;accent-color:var(--primary)}
-.set-row.done-row{opacity:.68;background:color-mix(in srgb,var(--green) 8%,transparent);border-radius:9px}
-.timer{font-size:43px;line-height:1;font-weight:850;text-align:center;margin:13px 0;color:var(--primary2);font-variant-numeric:tabular-nums}
-.timer.running{animation:pulse 1.2s infinite}@keyframes pulse{50%{transform:scale(1.02)}}
-.timer-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.timer-controls .btn:last-child{grid-column:1/-1}
-.row{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--surface2);border:1px solid var(--line);padding:11px;border-radius:13px}
-.list{display:flex;flex-direction:column;gap:9px}canvas{width:100%;height:230px;background:var(--surface2);border-radius:14px;border:1px solid var(--line)}
-.progressbar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}.progressbar>i{display:block;height:100%;background:var(--primary);border-radius:99px}
-.week-dot{display:inline-flex;width:29px;height:29px;align-items:center;justify-content:center;border-radius:50%;font-size:11px;font-weight:800;background:var(--surface2);color:var(--muted);margin:3px}
-.week-dot.done{background:var(--primary);color:#fff}.week-dot.current{outline:3px solid color-mix(in srgb,var(--primary) 20%,transparent)}
-.deload{background:color-mix(in srgb,var(--orange) 12%,var(--surface));border-color:color-mix(in srgb,var(--orange) 30%,var(--line))}
-details summary{cursor:pointer;font-weight:750}.small{font-size:12px}
-@media(max-width:390px){.grid,.formgrid{grid-template-columns:1fr}.sets{grid-template-columns:24px 1fr 1fr 1fr 29px}nav button{font-size:8px}}
-</style>
-</head>
-<body>
-<header>
-  <h1>🏋️ Sport Tracker</h1>
-  <div class="sub">PPL 12 semaines • progression simple • données sur ton appareil</div>
-  <nav aria-label="Navigation principale">
-<button class="active" data-view="dashboard">🏠<br>Accueil</button>
-<button data-view="session">🏋️<br>Séance</button>
-<button data-view="history">🗓️<br>Historique</button>
-<button data-view="progress">📈<br>Progrès</button>
-<button data-view="program">📋<br>Programme</button>
-<button data-view="settings">⚙️<br>Plus</button>
-</nav>
-</header>
-
+<!doctype html><html lang='fr'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><meta name='theme-color' content='#071014'><title>Sport RPG — System</title><style>
+:root{--bg:#071014;--bg2:#0b171c;--panel:#0f1f25;--line:#203a43;--text:#eaf6f4;--muted:#8ea7ad;--cyan:#48e4d0;--cyan2:#19bca8;--gold:#ffc857;--red:#ff6475;--blue:#63a9ff}
+*{box-sizing:border-box}body{margin:0;padding-bottom:92px;background:radial-gradient(circle at 80% -10%,#174b4a55,transparent 35%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font:14px/1.45 system-ui,-apple-system,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{position:sticky;top:0;z-index:20;padding:14px 15px;background:#071014e8;backdrop-filter:blur(18px);border-bottom:1px solid #183039}h1{margin:0;font-size:19px;letter-spacing:2px}.sub{color:var(--muted);font-size:10px}
+main{max-width:590px;margin:auto;padding:13px}.view{display:none}.view.active{display:block}nav{position:fixed;z-index:50;left:8px;right:8px;bottom:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:7px;background:#0c1b20ee;border:1px solid #24414a;border-radius:22px;backdrop-filter:blur(18px)}nav button{border:0;border-radius:15px;background:transparent;color:#789299;padding:8px 2px;font-size:9px;font-weight:800}nav button.active{background:#123a3b;color:var(--cyan)}
+.card{background:linear-gradient(145deg,#11242a,#0e1d22);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 30px #0005;margin-bottom:10px}.hero{background:linear-gradient(145deg,#12373a,#111d32);border-color:#275b5c;border-radius:22px;padding:18px}.system{font-size:10px;letter-spacing:2px;color:var(--cyan);font-weight:900}.level{display:flex;align-items:end;gap:10px;margin:6px 0}.levelnum{font-size:55px;font-weight:950;line-height:.9}.rank{color:var(--gold);font-weight:900}.xptext{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}.xpbar,.bossbar{height:10px;background:#061013;border-radius:99px;overflow:hidden;margin-top:5px}.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan2),var(--cyan));border-radius:99px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.statcard{padding:11px}.statname{font-size:10px;color:var(--muted);font-weight:800}.statvalue{font-size:24px;font-weight:950}.statxp{font-size:9px;color:var(--cyan)}h2{font-size:17px;margin:0 0 9px}h3{font-size:13px;margin:0 0 5px}.muted{color:var(--muted)}
+.btn{border:1px solid var(--line);background:#12272d;color:var(--text);border-radius:12px;padding:10px 12px;font-weight:800}.btn.primary{background:var(--cyan2);border-color:var(--cyan2);color:#041412}.btn.gold{color:var(--gold);background:#3b3013}.btn.red{color:#ff91a0;background:#351a21}.btn.blue{color:#8fc3ff;background:#152c44}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#132d33;color:#9ac1c4;border:1px solid #24454b;font-size:9px;font-weight:850}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}label{display:block;color:var(--muted);font-size:10px;font-weight:800;margin-bottom:4px}input,select,textarea{width:100%;padding:10px;border-radius:11px;background:#0b191e;color:var(--text);border:1px solid #274149}
+.exercise{margin-top:9px}.exercise-head{display:flex;justify-content:space-between}.prev{font-size:10px;color:var(--cyan);margin:5px 0}.sets{display:grid;grid-template-columns:25px 1fr 1fr 1fr 29px;gap:5px;align-items:center}.sets>div{font-size:8px;color:var(--muted);font-weight:800}.sets input{padding:8px}.done{width:22px;height:22px;accent-color:var(--cyan)}
+.timer{font-size:48px;text-align:center;font-weight:950;color:var(--cyan);font-variant-numeric:tabular-nums;margin:8px}.weekgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}.week{padding:8px 2px;text-align:center;border-radius:9px;background:#0d1b20;color:#6e858b;font-size:10px;border:1px solid #1d333a}.week.done{background:#164c43;color:#8df0d5}.week.current{outline:2px solid var(--cyan)}
+.quest,.achievement,.row{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);background:#0d1c21;border-radius:12px;margin-top:7px}.qxp{margin-left:auto;color:var(--gold);font-weight:900;font-size:10px}.qicon{font-size:20px}.locked{opacity:.4;filter:grayscale(1)}.boss{background:linear-gradient(145deg,#2a121a,#121c25);border-color:#5b2936}.bosslabel{color:#ff7c8b;font-size:9px;letter-spacing:1.5px;font-weight:900}.bossbar i{display:block;height:100%;background:linear-gradient(90deg,#d83d57,#ff7180);width:70%}
+canvas{width:100%;height:210px;background:#0a171b;border:1px solid #1f373e;border-radius:14px}.toast{position:fixed;z-index:80;left:50%;bottom:100px;transform:translate(-50%,20px);opacity:0;background:#102d31;border:1px solid #2d6664;padding:11px 14px;border-radius:13px;font-weight:800;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}.levelup{position:fixed;inset:0;z-index:90;display:none;place-items:center;background:#03090cf2;padding:25px}.levelup.show{display:grid}.levelupbox{text-align:center;width:100%;max-width:380px;background:linear-gradient(145deg,#12363a,#17152d);border:1px solid #3e7771;border-radius:25px;padding:28px}.big{font-size:68px;font-weight:950;color:var(--cyan);line-height:1}
+body.light{--bg:#eef6f5;--bg2:#f8fbfa;--text:#15272b;--muted:#6c7e82;--line:#d7e7e4}body.light header{background:#eef6f5ee}body.light nav{background:#ffffffee}body.light .card{background:#fff}body.light input,body.light select,body.light textarea{background:#f7fbfa;color:#15272b}
+@media(max-width:390px){.formgrid{grid-template-columns:1fr}.weekgrid{grid-template-columns:repeat(4,1fr)}}
+</style></head><body>
+<header><h1>◈ SYSTEM</h1><div class="sub">SPORT RPG • PROGRESSION PHYSIQUE</div></header>
 <main>
 <section id="dashboard" class="view active">
-  <div class="hero">
-    <h2>Ton cycle de 12 semaines</h2>
-    <p>Objectif du programme : <strong>perte de poids progressive, maintien/construction musculaire, condition physique, mobilité et explosivité.</strong></p>
-    <div class="formgrid">
-      <div><label>Poids actuel (kg)</label><input id="weightNow" type="number" step=".1"></div>
-      <div><label>Semaine du cycle</label><input id="weekNow" type="number" min="1" max="12"></div>
-      <div><label>Objectif poids (kg)</label><input id="weightGoal" type="number" step=".1" value="90"></div>
-    </div>
-    <div class="actions"><button class="btn primary" onclick="saveProfile()">Enregistrer</button></div>
-  </div>
-  <div class="card" style="margin-bottom:12px"><h2>📅 Ton cycle</h2><div id="weekTracker"></div></div>
-  <div id="deloadNotice" style="margin-bottom:12px"></div>
-  <div class="grid">
-    <div class="card"><h3>Poids</h3><div class="stat" id="dashWeight">—</div><div class="muted">objectif 90 kg</div></div>
-    <div class="card"><h3>Séances enregistrées</h3><div class="stat" id="dashSessions">0</div><div class="muted">dans ta base locale</div></div>
-    <div class="card"><h3>Séries enregistrées</h3><div class="stat" id="dashSets">0</div><div class="muted">tous exercices</div></div>
-    <div class="card"><h3>Volume total</h3><div class="stat" id="dashVolume">0 kg</div><div class="muted">charge × répétitions</div></div>
-  </div>
-  <div class="card" style="margin-top:14px"><h2>Planning hebdomadaire</h2><div class="daygrid">
-    <div class="day push"><b>Lundi</b><small>Push + mobilité</small><p>Développé couché<br>Incliné<br>Épaules<br>Triceps</p></div>
-    <div class="day cardio"><b>Mardi</b><small>Cardio + motricité</small><p>30–60 min selon phase<br>+ 10–15 min mobilité</p></div>
-    <div class="day pull"><b>Mercredi</b><small>Pull</small><p>Tirage vertical<br>Rowing<br>Biceps<br>Face pull</p></div>
-    <div class="day rest"><b>Jeudi</b><small>Repos / marche</small><p>Marche ou repos actif</p></div>
-    <div class="day legs"><b>Vendredi</b><small>Legs + explosivité</small><p>Presse<br>RDL<br>Leg curl<br>Mollets</p></div>
-    <div class="day cardio"><b>Samedi</b><small>Cardio</small><p>35–60 min selon phase<br>rythme varié</p></div>
-    <div class="day rest"><b>Dimanche</b><small>Repos</small><p>Récupération</p></div>
-  </div></div>
+<div class="hero"><div class="system">SYSTEM ONLINE</div><div class="level"><div class="levelnum" id="level">1</div><div><div class="rank" id="rank">NOVICE</div><div class="muted">Niveau général</div></div></div><div class="xptext"><span id="xp">0 / 100 XP</span><span id="pct">0%</span></div><div class="xpbar"><i id="xpbar"></i></div><div class="actions"><button class="btn primary" onclick="go('session')">⚔ COMMENCER</button><button class="btn gold" onclick="go('quests')">🎯 QUÊTES</button></div></div>
+<div class="card"><h2>📊 Attributs</h2><div id="stats" class="grid2"></div></div>
+<div class="card"><h2>📅 Cycle 12 semaines</h2><div id="weeks" class="weekgrid"></div><p id="phase" class="muted"></p></div>
+<div class="card boss"><div class="bosslabel">⚔ BOSS — PROCHAIN RECORD</div><h2 id="bossName">Ton premier record</h2><div id="bossText" class="muted">Enregistre une performance pour créer ton premier défi.</div><div class="bossbar"><i id="bossbar"></i></div></div>
 </section>
-
-<section id="session" class="view">
-  <div class="card">
-    <h2>Nouvelle séance</h2><p class="note" style="margin-top:-7px">Ta dernière charge est préremplie. Valide une série pour lancer automatiquement le repos.</p>
-    <div class="formgrid">
-      <div><label>Date</label><input id="sessionDate" type="date"></div>
-      <div><label>Type</label><select id="sessionType"><option>Push</option><option>Pull</option><option>Legs</option><option>Cardio</option><option>Mobilité</option></select></div>
-      <div><label>Phase</label><select id="sessionPhase"><option value="1">Phase 1 — semaines 1 à 4</option><option value="2">Phase 2 — semaines 5 à 8</option><option value="3">Phase 3 — semaines 9 à 12</option></select></div>
-    </div>
-  </div>
-  <div id="sessionExercises"></div>
-  <div class="card" style="margin-top:12px">
-    <h3>Chronomètre de repos</h3><div class="timer" id="timer">02:00</div>
-    <div class="timer-controls"><button class="btn blue" onclick="startTimer(60)">60 s</button><button class="btn blue" onclick="startTimer(90)">90 s</button><button class="btn blue" onclick="startTimer(120)">120 s</button><button class="btn" onclick="stopTimer()">Stop</button></div>
-  </div>
-  <div class="card" style="margin-top:12px"><label>Notes de séance</label><textarea id="sessionNotes" rows="3" placeholder="Technique, fatigue, sensations..."></textarea><div class="actions"><button class="btn primary" onclick="saveSession()">💾 Enregistrer la séance</button><button class="btn" onclick="clearSessionForm()">Réinitialiser</button></div></div>
-</section>
-
-<section id="history" class="view">
-  <div class="card"><h2>Historique</h2><div class="formgrid"><div><label>Filtrer</label><select id="historyFilter" onchange="renderHistory()"><option value="">Toutes</option><option>Push</option><option>Pull</option><option>Legs</option><option>Cardio</option><option>Mobilité</option></select></div></div></div>
-  <div id="historyList" class="list" style="margin-top:12px"></div>
-</section>
-
-<section id="progress" class="view">
-  <div class="card"><h2>Progression du volume</h2><canvas id="chart"></canvas><p class="note">Le graphique utilise les séances enregistrées. Le volume est calculé uniquement pour les séries avec charge et répétitions.</p></div>
-  <div class="card" style="margin-top:12px"><h2>Meilleures performances</h2><div id="bestList"></div></div>
-</section>
-
-<section id="program" class="view">
-  <div class="hero"><h2>Programme source intégré</h2><p>Les exercices, séries × répétitions et repos ci-dessous reprennent la base des deux visuels fournis.</p></div>
-  <div class="grid">
-    <div class="card push"><h2>🔴 PUSH</h2><p class="note">Poitrine — épaules — triceps</p><div id="programPush"></div></div>
-    <div class="card pull"><h2>🔵 PULL</h2><p class="note">Dos — biceps — posture</p><div id="programPull"></div></div>
-    <div class="card legs"><h2>🟢 LEGS</h2><p class="note">Jambes — fessiers — mollets</p><div id="programLegs"></div></div>
-  </div>
-  <div class="grid" style="margin-top:14px">
-    <div class="card"><h3>Phase 1 — semaines 1 à 4</h3><p>Apprendre les mouvements, construire la base, progresser doucement. RIR 2–3. Objectif : technique + régularité.</p></div>
-    <div class="card"><h3>Phase 2 — semaines 5 à 8</h3><p>Plus de volume et d'intensité, exercices unilatéraux, progression des charges. Objectif : force + masse musculaire.</p></div>
-    <div class="card"><h3>Phase 3 — semaines 9 à 12</h3><p>Puissance, explosivité, stabilité et charges plus lourdes si possible. Objectif : athlétisme + performance.</p></div>
-  </div>
-  <div class="card" style="margin-top:14px"><h3>Règles du programme</h3><p>Échauffement 5–10 min • respecter les repos • technique propre • progression progressive des charges • écouter son corps • hydratation et sommeil.</p><p class="note">La deuxième image prévoit aussi du cardio 2×/semaine, de la marche quotidienne, de la mobilité 2–3×/semaine et une semaine de deload toutes les 4 semaines (-20 à 30 % de volume).</p></div>
-</section>
-
-<section id="settings" class="view">
-  <div class="card"><h2>Données & apparence</h2><div class="actions"><button id="themeBtn" class="btn" onclick="toggleTheme()">🌙 Mode sombre</button></div></div><div class="card" style="margin-top:10px"><h2>Données locales</h2><p>Tout est stocké dans le navigateur via <b>localStorage</b>. Rien n'est envoyé à un serveur.</p><div class="actions"><button class="btn blue" onclick="exportData()">Exporter mes données (.json)</button><label class="btn" style="display:inline-block">Importer .json<input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)"></label><button class="btn danger" onclick="resetData()">Effacer toutes les données</button></div></div>
-</section>
+<section id="session" class="view"><div class="card"><h2>⚔ Nouvelle séance</h2><div class="formgrid"><div><label>TYPE</label><select id="type"><option>Push</option><option>Pull</option><option>Legs</option></select></div><div><label>DATE</label><input id="date" type="date"></div></div><div class="formgrid" style="margin-top:8px"><div><label>PHASE</label><select id="phase"><option value="1">Fondation</option><option value="2">Construction</option><option value="3">Intensification</option></select></div><div><label>SEMAINE</label><input id="week" type="number" min="1" max="12"></div></div></div><div id="exercises"></div>
+<div class="card"><h2>⏱ Repos</h2><div id="timer" class="timer">01:30</div><div class="actions"><button class="btn" onclick="timer(60)">60s</button><button class="btn" onclick="timer(90)">90s</button><button class="btn" onclick="timer(120)">120s</button><button class="btn red" onclick="stopTimer()">STOP</button></div></div>
+<div class="card"><label>NOTES DE COMBAT</label><textarea id="notes" rows="3" placeholder="Énergie, difficulté, sensations..."></textarea><div class="actions"><button class="btn primary" onclick="finishSession()">✓ TERMINER • GAGNER XP</button></div></div></section>
+<section id="quests" class="view"><div class="card"><h2>🎯 Quêtes</h2><div id="questsList"></div></div><div class="card"><h2>🏆 Succès</h2><div id="achievements"></div></div></section>
+<section id="progress" class="view"><div class="card"><h2>📈 Volume</h2><canvas id="chart"></canvas></div><div class="card"><h2>🏅 Records</h2><div id="records"></div></div><div class="card"><h2>⚖ Poids</h2><div id="weights"></div></div></section>
+<section id="profile" class="view"><div class="card"><h2>👤 Profil</h2><div class="formgrid"><div><label>POIDS</label><input id="weight" type="number" step=".1"></div><div><label>OBJECTIF</label><input id="goal" type="number" step=".1"></div></div><label style="margin-top:8px">SEMAINE</label><input id="currentWeek" type="number" min="1" max="12"><div class="actions"><button class="btn primary" onclick="saveProfile()">Sauvegarder</button><button class="btn" onclick="toggleTheme()">☼ Thème</button></div></div><div class="card"><h2>💾 Données</h2><div class="actions"><button class="btn blue" onclick="exportData()">Exporter</button><label class="btn">Importer<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label><button class="btn red" onclick="resetData()">Effacer</button></div></div></section>
 </main>
-
+<nav><button class="active" data-view="dashboard">◈<br>HOME</button><button data-view="session">⚔<br>SEANCE</button><button data-view="quests">🎯<br>QUÊTES</button><button data-view="progress">📈<br>PROGRÈS</button><button data-view="profile">👤<br>PROFIL</button></nav>
+<div id="toast" class="toast"></div><div id="levelup" class="levelup"><div class="levelupbox"><div class="system">LEVEL UP</div><div id="newLevel" class="big">2</div><h2 id="newRank">NOUVEAU RANG</h2><p class="muted">Tes entraînements ont fait progresser ton personnage.</p><button class="btn primary" onclick="closeLevel()">CONTINUER</button></div></div>
 
 <script>
-const PROGRAM={
-Push:[
-["Développé couché","3 × 6–10","120–180 s"],["Développé incliné haltères","3 × 8–12","90–120 s"],["Développé épaules","3 × 8–12","90–120 s"],["Élévations latérales","3 × 12–20","60–90 s"],["Extension triceps poulie","3 × 10–15","60–90 s"],["Dips (ou machine)","3 × 8–12","90–120 s"],["Extension triceps au-dessus de la tête","2–3 × 10–15","60–90 s"],["Face Pull (optionnel)","2–3 × 12–20","60–90 s"]],
-Pull:[
-["Tirage vertical (larges ou neutres)","3 × 8–12","90–120 s"],["Rowing assis poulie","3 × 8–12","90–120 s"],["Rowing unilatéral","2 × 10–12","60–90 s"],["Face Pull","3 × 12–20","60–90 s"],["Curl biceps","3 × 10–15","60–90 s"],["Curl marteau","2–3 × 10–15","60–90 s"],["Oiseau / reverse fly","2–3 × 12–20","60–90 s"],["Farmer walk","3 × 30–45 s","90–120 s"]],
-Legs:[
-["Presse à cuisses","3 × 8–12","90–120 s"],["Soulevé de terre roumain","3 × 8–10","90–120 s"],["Leg curl","3 × 10–15","60–90 s"],["Split squat bulgare","2 × 8–10 / jambe","90–120 s"],["Extension de jambe","3 × 10–15","60–90 s"],["Mollets debout","4 × 12–20","45–60 s"],["Gainage","3 × 30–60 s","45–60 s"],["Sauts / puissance","3 × 5 (ou 30 s)","60–90 s"]]
-};
-const DAY_PLAN=[
-["Lundi","Push","push","Poitrine • épaules • triceps"],
-["Mardi","Cardio + mobilité","cardio","30–60 min • mobilité"],
-["Mercredi","Pull","pull","Dos • biceps • posture"],
-["Jeudi","Repos","rest","Marche / récupération"],
-["Vendredi","Legs","legs","Jambes • fessiers • puissance"],
-["Samedi","Cardio","cardio","35–60 min selon phase"],
-["Dimanche","Repos","rest","Récupération"]
-];
-let raw=localStorage.getItem("sportTrackerDB");
-let db;
-try{db=JSON.parse(raw||"null")}catch(e){db=null}
-db=db&&db.sessions?db:{profile:{weight:120,goal:90,week:1,theme:"light",weightHistory:[]},sessions:[]};
-db.profile=db.profile||{weight:120,goal:90,week:1,theme:"light",weightHistory:[]};
-db.profile.weightHistory=db.profile.weightHistory||[];
-db.profile.theme=db.profile.theme||"light";
-let timerInterval=null,timerEnd=0,timerReturnType=null;
-
-function persist(){localStorage.setItem("sportTrackerDB",JSON.stringify(db));updateDash()}
-function today(){return new Date().toISOString().slice(0,10)}
-function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
- document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
- document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.getElementById(b.dataset.view).classList.add("active");
- if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="progress")renderProgress();if(b.dataset.view==="dashboard")renderWeekTracker();
-});
-function saveProfile(){
- const old=db.profile.weight;
- db.profile.weight=+document.getElementById("weightNow").value||old;
- db.profile.goal=+document.getElementById("weightGoal").value||90;
- db.profile.week=Math.min(12,Math.max(1,+document.getElementById("weekNow").value||1));
- if(old!==db.profile.weight)db.profile.weightHistory.push({date:today(),weight:db.profile.weight});
- persist();renderWeightHistory();alert("Profil enregistré.");
-}
-function updateDash(){
- document.getElementById("dashWeight").textContent=(db.profile.weight??"—")+" kg";
- document.getElementById("dashSessions").textContent=db.sessions.length;
- let sets=0,vol=0;
- db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.done)sets++;if(x.charge&&x.reps)vol+=+x.charge*+x.reps})));
- document.getElementById("dashSets").textContent=sets;document.getElementById("dashVolume").textContent=Math.round(vol)+" kg";
- document.getElementById("weightNow").value=db.profile.weight;document.getElementById("weekNow").value=db.profile.week;document.getElementById("weightGoal").value=db.profile.goal;
- document.body.classList.toggle("dark",db.profile.theme==="dark");
- renderWeekTracker();
-}
-function weekSessions(w){return db.sessions.filter(s=>Number(s.phase)===Number(Math.ceil(w/4))).length}
-function renderWeekTracker(){
- const w=+db.profile.week||1, phase=w<=4?1:w<=8?2:3, start=(phase-1)*4+1;
- let dots="";for(let i=1;i<=12;i++){let done=db.sessions.filter(s=>+s.week===i).length>=3;dots+=`<span class="week-dot ${done?"done":""} ${i===w?"current":""}">${i}</span>`}
- const box=document.getElementById("weekTracker");if(box)box.innerHTML=`<div>${dots}</div><p class="small"><b>Semaine ${w}/12</b> • Phase ${phase}${w%4===0?` • <b>Deload prévu cette semaine</b>`:""}</p><div class="progressbar"><i style="width:${Math.round(w/12*100)}%"></i></div>`;
- const dl=document.getElementById("deloadNotice");if(dl)dl.innerHTML=w%4===0?`<div class="card deload"><b>🧘 Semaine de deload</b><p class="note">Réduis le volume d'environ 20–30 %, garde une technique propre et privilégie la récupération.</p></div>`:"";
-}
-function renderSession(){
- const type=document.getElementById("sessionType").value,arr=PROGRAM[type]||[];
- document.getElementById("sessionExercises").innerHTML=arr.map((e,i)=>{
-   const prev=findLastExercise(type,e[0]);
-   const prevText=prev?`Dernière fois : ${prev.charge||"—"} kg × ${prev.reps||"—"} reps`:"Pas encore de performance enregistrée";
-   const defaultCharge=prev?.charge||"";
-   const n=parseInt(e[1])||3;
-   return `<div class="card exercise">
-    <div class="exercise-head"><div><h3>${escapeHtml(e[0])}</h3><span class="badge">${e[1]}</span><span class="badge">Repos ${e[2]}</span></div></div>
-    <div class="prev">↗ ${prevText}</div>
-    <div class="sets"><div>Série</div><div>kg</div><div>Reps</div><div>Repos</div><div>✓</div>
-    ${Array.from({length:n},(_,j)=>`<div>${j+1}</div><input data-ex="${i}" data-set="${j}" data-field="charge" type="number" step=".5" value="${defaultCharge}"><input data-ex="${i}" data-set="${j}" data-field="reps" type="number" min="0"><input data-ex="${i}" data-set="${j}" data-field="rest" type="number" placeholder="90"><input data-ex="${i}" data-set="${j}" data-field="done" class="done" type="checkbox" onchange="setDone(this)">`).join("")}</div>
-    <div class="actions"><button class="btn blue" onclick="addSet(${i})">＋ Ajouter une série</button></div>
-   </div>`}).join("");
-}
-function findLastExercise(type,name){
- let all=[];db.sessions.slice().sort((a,b)=>b.id-a.id).forEach(s=>{if(s.type===type){let e=s.exercises.find(x=>x.name===name);if(e)e.sets.forEach(x=>{if(x.done&&x.charge&&x.reps)all.push(x)})}});
- return all[0]||null;
-}
-function setDone(cb){
- const row=cb.closest(".sets");let idx=[...row.querySelectorAll('input[type="checkbox"]')].indexOf(cb);
- if(cb.checked){const set=cb.dataset;let rest=Number(cb.closest(".sets").querySelectorAll(`[data-set="${cb.dataset.set}"][data-field="rest"]`)[0]?.value||90);startTimer(rest||90);}
- cb.closest(".sets").classList.toggle("done-row",cb.checked);
-}
-function addSet(i){
- const box=document.querySelectorAll(".exercise")[i],sets=box.querySelector(".sets"),n=sets.querySelectorAll('[data-field="charge"]').length+1;
- let row=document.createElement("div");row.textContent=n;sets.append(row);
- [["charge","number",""],["reps","number",""],["rest","number","90"],["done","checkbox",""]].forEach(([field,type,val])=>{let x=document.createElement("input");x.dataset.ex=i;x.dataset.set=n-1;x.dataset.field=field;x.type=type;if(val)x.placeholder=val;if(field==="charge"){let p=findLastExercise(document.getElementById("sessionType").value,PROGRAM[document.getElementById("sessionType").value][i][0]);if(p)x.value=p.charge}if(field==="done")x.className="done",x.onchange=()=>setDone(x);sets.append(x)});
-}
-document.getElementById("sessionType").onchange=renderSession;
-function saveSession(){
- const type=document.getElementById("sessionType").value;
- const exercises=PROGRAM[type].map((e,i)=>{
-   const inputs=[...document.querySelectorAll(`[data-ex="${i}"]`)],sets=[];
-   let max=inputs.reduce((m,x)=>Math.max(m,+x.dataset.set),-1);
-   for(let j=0;j<=max;j++){const get=f=>inputs.find(x=>+x.dataset.set===j&&x.dataset.field===f);let c=get("charge"),r=get("reps"),re=get("rest"),d=get("done");sets.push({charge:+(c?.value||0),reps:+(r?.value||0),rest:+(re?.value||0),done:!!d?.checked})}
-   return{name:e[0],target:e[1],restTarget:e[2],sets};
- });
- db.sessions.push({id:Date.now(),date:document.getElementById("sessionDate").value||today(),type,phase:+document.getElementById("sessionPhase").value,week:+db.profile.week||1,notes:document.getElementById("sessionNotes").value,exercises});
- persist();alert("✅ Séance enregistrée");renderHistory();renderProgress();
-}
-function clearSessionForm(){document.getElementById("sessionNotes").value="";renderSession()}
-function startTimer(sec){stopTimer();timerEnd=Date.now()+sec*1000;const t=document.getElementById("timer");t.classList.add("running");timerInterval=setInterval(()=>{let left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));t.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");if(!left){stopTimer();navigator.vibrate?.(300)}},150)}
-function stopTimer(){clearInterval(timerInterval);timerInterval=null;document.getElementById("timer").classList.remove("running")}
-function renderHistory(){
- const f=document.getElementById("historyFilter").value,arr=db.sessions.filter(s=>!f||s.type===f).slice().reverse();
- document.getElementById("historyList").innerHTML=arr.length?arr.map(s=>`<div class="card"><div class="row"><div><b>${s.date} — ${s.type}</b><div class="muted">Semaine ${s.week||"—"} • Phase ${s.phase}</div></div><button class="btn danger" onclick="deleteSession(${s.id})">Supprimer</button></div><details style="margin-top:9px"><summary>Détail</summary>${s.exercises.map(e=>`<p><b>${escapeHtml(e.name)}</b><br>${e.sets.filter(x=>x.done||x.charge||x.reps).map(x=>`${x.charge||"—"} kg × ${x.reps||"—"} reps`).join(" • ")||"aucune série"}</p>`).join("")}<p class="note">${escapeHtml(s.notes||"")}</p></details></div>`).join(""):"<div class='card'>Aucune séance enregistrée.</div>";
-}
-function deleteSession(id){if(confirm("Supprimer cette séance ?")){db.sessions=db.sessions.filter(s=>s.id!==id);persist();renderHistory();renderProgress()}}
-function renderProgress(){
- let canvas=document.getElementById("chart"),ctx=canvas.getContext("2d"),dpr=2,w=canvas.clientWidth*dpr,h=canvas.clientHeight*dpr;canvas.width=w;canvas.height=h;ctx.clearRect(0,0,w,h);
- let vals=db.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(s=>{let v=0;s.exercises.forEach(e=>e.sets.forEach(x=>v+=(x.charge||0)*(x.reps||0)));return{date:s.date,v}}),max=Math.max(1,...vals.map(x=>x.v));
- ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue("--line");ctx.lineWidth=2;for(let i=1;i<5;i++){let y=h*i/5;ctx.beginPath();ctx.moveTo(25,y);ctx.lineTo(w-15,y);ctx.stroke()}
- ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue("--primary");ctx.lineWidth=5;ctx.beginPath();vals.forEach((p,i)=>{let x=30+i*Math.max(1,(w-50)/Math.max(1,vals.length-1)),y=h-25-(p.v/max)*(h-55);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
- document.getElementById("bestList").innerHTML=bestPerformances();renderWeightHistory()
-}
-function bestPerformances(){
- let best={};db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.charge&&x.reps){best[e.name]??={charge:0,reps:0,volume:0};best[e.name].charge=Math.max(best[e.name].charge,+x.charge);best[e.name].reps=Math.max(best[e.name].reps,+x.reps);best[e.name].volume=Math.max(best[e.name].volume,+x.charge*+x.reps)}})));
- return Object.keys(best).length?Object.entries(best).map(([n,v])=>`<div class="row"><b>${escapeHtml(n)}</b><span class="small">${v.charge} kg • ${v.reps} reps • ${v.volume} kg/série</span></div>`).join(""):"<p class='muted'>Enregistre des séries pour voir tes meilleures performances.</p>"
-}
-function renderWeightHistory(){
- const box=document.getElementById("weightHistory");if(!box)return;
- const arr=db.profile.weightHistory.slice().sort((a,b)=>a.date.localeCompare(b.date));
- if(!arr.length){box.innerHTML="<p class='muted'>Enregistre ton poids dans le profil pour commencer.</p>";return}
- const start=arr[0].weight,last=arr[arr.length-1].weight,diff=(last-start).toFixed(1);
- box.innerHTML=`<div class="row"><span>Départ</span><b>${start} kg</b></div><div class="row"><span>Actuel</span><b>${last} kg</b></div><div class="row"><span>Évolution</span><b>${diff>0?"+":""}${diff} kg</b></div>${arr.slice(-8).reverse().map(x=>`<div class="row"><span>${x.date}</span><b>${x.weight} kg</b></div>`).join("")}`
-}
-function renderProgram(){
- for(let t of ["Push","Pull","Legs"])document.getElementById("program"+t).innerHTML=PROGRAM[t].map(e=>`<div class="row"><span><b>${escapeHtml(e[0])}</b><br><span class="muted">${e[1]}</span></span><span class="badge">${e[2]}</span></div>`).join("")
-}
-function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="sport-tracker-sauvegarde.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
-function importData(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(x.sessions&&x.profile){db=x;db.profile.weightHistory??=[];db.profile.theme??="light";persist();renderHistory();renderProgress();alert("Import réussi.")}else alert("Fichier invalide.")}catch(e){alert("Impossible de lire le fichier.")}};r.readAsText(f)}
-function resetData(){if(confirm("Effacer toutes les séances et données ?")){db={profile:{weight:120,goal:90,week:1,theme:"light",weightHistory:[]},sessions:[]};persist();renderHistory();renderProgress()}}
-function toggleTheme(){db.profile.theme=db.profile.theme==="dark"?"light":"dark";persist();document.getElementById("themeBtn").textContent=db.profile.theme==="dark"?"☀️ Mode clair":"🌙 Mode sombre"}
-document.getElementById("sessionDate").value=today();
-renderSession();renderProgram();updateDash();
+const P={Push:[["Développé couché","3 × 6–10"],["Développé incliné haltères","3 × 8–12"],["Développé épaules","3 × 8–12"],["Élévations latérales","3 × 12–20"],["Extension triceps","3 × 10–15"],["Dips / machine","3 × 8–12"]],Pull:[["Tirage vertical","3 × 8–12"],["Rowing poulie","3 × 8–12"],["Rowing unilatéral","2 × 10–12"],["Face Pull","3 × 12–20"],["Curl biceps","3 × 10–15"],["Curl marteau","2 × 10–15"]],Legs:[["Presse à cuisses","3 × 8–12"],["Soulevé de terre roumain","3 × 8–10"],["Leg curl","3 × 10–15"],["Split squat bulgare","2 × 8–10"],["Extension de jambe","3 × 10–15"],["Mollets debout","4 × 12–20"],["Gainage","3 × 30–60s"]]};
+let db;try{db=JSON.parse(localStorage.getItem("sportTrackerDB")||"null")}catch(e){}
+db=db&&db.sessions?db:{profile:{weight:120,goal:90,week:1,theme:"dark",weightHistory:[]},sessions:[]};
+db.profile=db.profile||{weight:120,goal:90,week:1,theme:"dark",weightHistory:[]};db.profile.weightHistory??=[];
+db.rpg=db.rpg||{xp:0,level:1,stats:{force:1,endurance:1,puissance:1,resistance:1,mobilite:1,discipline:1}};
+const names={force:"💪 Force",endurance:"🫀 Endurance",puissance:"⚡ Puissance",resistance:"🛡 Résistance",mobilite:"🧘 Mobilité",discipline:"🔥 Discipline"};
+let ti=null,end=0;
+function save(){localStorage.setItem("sportTrackerDB",JSON.stringify(db))}
+function need(l){return Math.round(100+l**1.45*32)}
+function rank(l){return l<5?"NOVICE":l<10?"APPRENTI":l<20?"COMBATTANT":l<30?"ÉLITE":l<40?"MAÎTRE":l<60?"GRAND MAÎTRE":"TRANSCENDANT"}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
+function go(id){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));if(id==="session")renderSession();if(id==="quests")renderQuests();if(id==="progress")renderProgress();scrollTo(0,0)}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>go(b.dataset.view));
+function stats(){let s={...db.rpg.stats};s.discipline+=Math.min(30,db.sessions.length*2);db.sessions.forEach(a=>a.exercises.forEach(e=>e.sets.forEach(x=>{if(x.done){s.resistance++;if(x.charge*x.reps>=500)s.force++}})));return s}
+function addXP(n,reason){let old=db.rpg.level;db.rpg.xp+=n;while(db.rpg.xp>=need(db.rpg.level)){db.rpg.xp-=need(db.rpg.level);db.rpg.level++;Object.keys(db.rpg.stats).forEach(k=>{if(Math.random()<.6)db.rpg.stats[k]++})}save();if(db.rpg.level>old){document.getElementById("newLevel").textContent=db.rpg.level;document.getElementById("newRank").textContent=rank(db.rpg.level);document.getElementById("levelup").classList.add("show")}toast("+"+n+" XP • "+reason);renderAll()}
+function renderHome(){let l=db.rpg.level,n=need(l),p=Math.round(db.rpg.xp/n*100),s=stats();level.textContent=l;rank.textContent=rank(l);xp.textContent=db.rpg.xp+" / "+n+" XP";pct.textContent=p+"%";xpbar.style.width=p+"%";statsEl();let w=+db.profile.week||1;weeks.innerHTML=Array.from({length:12},(_,i)=>{let q=i+1,d=db.sessions.filter(x=>+x.week===q).length>=3;return `<div class="week ${d?"done":""} ${q===w?"current":""}">S${q}</div>`}).join("");phase.textContent=`Semaine ${w}/12 • ${w<=4?"Fondation":w<=8?"Construction":"Intensification"}${w%4===0?" • Deload conseillé":""}`;boss()}
+function statsEl(){let s=stats();document.getElementById("stats").innerHTML=Object.entries(names).map(([k,v])=>`<div class="card statcard"><div class="statname">${v}</div><div class="statvalue">${s[k]}</div><div class="statxp">progression active</div></div>`).join("")}
+function boss(){let best={};db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.done&&x.charge&&x.reps){let v=x.charge*x.reps;if(!best[e.name]||v>best[e.name].v)best[e.name]={v,c:x.charge,r:x.reps}}})));let k=Object.keys(best)[0];if(!k){bossName.textContent="Ton premier record";bossText.textContent="Enregistre une performance pour créer ton premier défi.";bossbar.style.width="0%"}else{let b=best[k];bossName.textContent=k;bossText.textContent=`Record : ${b.c} kg × ${b.r} • Boss suivant : ${(b.c*1.025).toFixed(1)} kg`;bossbar.style.width="75%"}}
+function prev(type,name){let a=null;db.sessions.slice().sort((a,b)=>b.id-a.id).forEach(s=>{if(!a&&s.type===type){let e=s.exercises.find(x=>x.name===name);e?.sets.forEach(x=>{if(!a&&x.done&&x.charge)a=x})}});return a}
+function renderSession(){let t=type.value,arr=P[t];date.value ||= new Date().toISOString().slice(0,10);week.value=db.profile.week||1;exercises.innerHTML=arr.map((e,i)=>{let p=prev(t,e[0]),n=parseInt(e[1])||3;return `<div class="card exercise"><h3>${esc(e[0])}</h3><span class="badge">${e[1]}</span><div class="prev">${p?`Dernier : ${p.charge} kg × ${p.reps||"?"} • prérempli`:"Premier essai — crée ton record"}</div><div class="sets"><div>#</div><div>kg</div><div>reps</div><div>repos</div><div>✓</div>${Array.from({length:n},(_,j)=>`<div>${j+1}</div><input data-e="${i}" data-s="${j}" data-f="c" type="number" step=".5" value="${p?.charge||""}"><input data-e="${i}" data-s="${j}" data-f="r" type="number"><input data-e="${i}" data-s="${j}" data-f="rest" type="number" placeholder="90"><input class="done" data-e="${i}" data-s="${j}" data-f="d" type="checkbox" onchange="doneSet(this)">`).join("")}</div><div class="actions"><button class="btn blue" onclick="addSet(${i})">＋ série</button></div></div>`}).join("")}
+type.onchange=renderSession;
+function addSet(i){let g=document.querySelectorAll(".exercise")[i].querySelector(".sets"),n=g.querySelectorAll('[data-f="c"]').length;g.insertAdjacentHTML("beforeend",`<div>${n+1}</div><input data-e="${i}" data-s="${n}" data-f="c" type="number" step=".5"><input data-e="${i}" data-s="${n}" data-f="r" type="number"><input data-e="${i}" data-s="${n}" data-f="rest" type="number" placeholder="90"><input class="done" data-e="${i}" data-s="${n}" data-f="d" type="checkbox" onchange="doneSet(this)">`)}
+function doneSet(x){if(x.checked){let rest=+document.querySelector(`[data-e="${x.dataset.e}"][data-s="${x.dataset.s}"][data-f="rest"]`).value||90;timer(rest)}}
+function timer(sec){stopTimer();end=Date.now()+sec*1000;ti=setInterval(()=>{let x=Math.max(0,Math.ceil((end-Date.now())/1000));document.getElementById("timer").textContent=String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0");if(!x){stopTimer();navigator.vibrate?.(200);toast("Repos terminé")}},200)}
+function stopTimer(){clearInterval(ti);ti=null}
+function finishSession(){let t=type.value,arr=P[t],ex=arr.map((e,i)=>{let xs=[...document.querySelectorAll(`[data-e="${i}"]`)],m=Math.max(-1,...xs.map(x=>+x.dataset.s)),sets=[];for(let j=0;j<=m;j++){let g=f=>xs.find(x=>+x.dataset.s===j&&x.dataset.f===f);sets.push({charge:+(g("c")?.value||0),reps:+(g("r")?.value||0),rest:+(g("rest")?.value||0),done:!!g("d")?.checked})}return{name:e[0],target:e[1],sets}}),done=ex.reduce((a,e)=>a+e.sets.filter(x=>x.done).length,0),vol=ex.reduce((a,e)=>a+e.sets.reduce((n,x)=>n+(x.charge*x.reps||0),0),0);db.sessions.push({id:Date.now(),date:date.value,type:t,phase:+phase.value,week:+week.value,notes:notes.value,exercises:ex});db.rpg.stats.discipline++;if(done>=10)db.rpg.stats.resistance++;if(vol>=3000)db.rpg.stats.force++;if(t==="Legs")db.rpg.stats.puissance++;save();addXP(150+done*18+Math.min(300,Math.round(vol/50)),"Séance terminée");go("dashboard")}
+function renderQuests(){let s=db.sessions.length,w=+db.profile.week||1,ws=db.sessions.filter(x=>+x.week===w).length,q=[["⚔","Première séance",s>=1,200],["🔥","3 séances cette semaine",ws>=3,350],["🏋","20 séances au total",s>=20,600],["👹","Créer un record personnel",hasPR(),300],["👑","Atteindre le niveau 10",db.rpg.level>=10,500]];questsList.innerHTML=q.map(x=>`<div class="quest ${x[2]?"locked":""}"><div class="qicon">${x[0]}</div><div><b>${x[1]}</b></div><div class="qxp">+${x[3]} XP</div></div>`).join("");let a=[["🥉","Premier sang",s>=1],["⚔","Forgeur",s>=10],["🔥","Discipline",s>=20],["👹","Boss vaincu",hasPR()],["👑","Éveillé",db.rpg.level>=10],["🌌","Transcendance",db.rpg.level>=50]];achievements.innerHTML=a.map(x=>`<div class="achievement ${x[2]?"":"locked"}"><span style="font-size:23px">${x[0]}</span><b>${x[1]}</b></div>`).join("")}
+function hasPR(){let any=false;db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.done&&x.charge&&x.reps)any=true})));return any}
+function renderProgress(){let c=document.getElementById("chart"),ctx=c.getContext("2d"),w=c.clientWidth*2,h=c.clientHeight*2;c.width=w;c.height=h;ctx.clearRect(0,0,w,h);let v=db.sessions.map(s=>s.exercises.reduce((a,e)=>a+e.sets.reduce((n,x)=>n+x.charge*x.reps,0),0)),mx=Math.max(1,...v);ctx.strokeStyle="#48e4d0";ctx.lineWidth=5;ctx.beginPath();v.forEach((x,i)=>{let X=20+i*(w-40)/Math.max(1,v.length-1),Y=h-20-x/mx*(h-50);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.stroke();let b={};db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.charge&&x.reps){let q=x.charge*x.reps;if(!b[e.name]||q>b[e.name].v)b[e.name]={v:q,c:x.charge,r:x.reps}}})));records.innerHTML=Object.entries(b).map(([n,x])=>`<div class="row"><b>${esc(n)}</b><span>${x.c} kg × ${x.r}</span></div>`).join("")||"<p class='muted'>Tes records apparaîtront ici.</p>";weights.innerHTML=(db.profile.weightHistory||[]).slice().reverse().map(x=>`<div class="row"><span>${x.date}</span><b>${x.weight} kg</b></div>`).join("")||"<p class='muted'>Ajoute ton poids dans Profil.</p>"}
+function saveProfile(){let old=db.profile.weight;db.profile.weight=+weight.value||old;db.profile.goal=+goal.value||90;db.profile.week=Math.min(12,Math.max(1,+currentWeek.value||1));if(db.profile.weight!==old)db.profile.weightHistory.push({date:new Date().toISOString().slice(0,10),weight:db.profile.weight});save();renderAll();toast("Profil sauvegardé")}
+function exportData(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}));a.download="sport-rpg-sauvegarde.json";a.click()}
+function importData(e){let f=e.target.files[0],r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.sessions||!x.profile)throw 0;db=x;db.rpg??={xp:0,level:1,stats:{force:1,endurance:1,puissance:1,resistance:1,mobilite:1,discipline:1}};save();renderAll();toast("Import réussi")}catch(_){alert("Fichier invalide")}};r.readAsText(f)}
+function resetData(){if(confirm("Effacer toutes les données ?")){localStorage.removeItem("sportTrackerDB");location.reload()}}
+function toggleTheme(){db.profile.theme=db.profile.theme==="light"?"dark":"light";save();renderAll()}
+function closeLevel(){levelup.classList.remove("show")}
+function renderAll(){document.body.classList.toggle("light",db.profile.theme==="light");renderHome();renderSession();renderQuests();renderProgress();weight.value=db.profile.weight||120;goal.value=db.profile.goal||90;currentWeek.value=db.profile.week||1}
+date.value=new Date().toISOString().slice(0,10);renderAll();
 </script>
 </body></html>
