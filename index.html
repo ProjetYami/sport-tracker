@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sport Tracker — PPL 12 semaines</title>
+<style>
+:root{--bg:#07111d;--panel:#0d1b2a;--panel2:#12253a;--text:#f5f7fa;--muted:#aab8c7;--red:#ef3340;--blue:#1597e5;--green:#18b77a;--purple:#7c5cff;--line:#294057;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#06101b,#0b1d30);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{padding:22px 18px 12px;position:sticky;top:0;z-index:10;background:rgba(7,17,29,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:25px}.sub{color:var(--muted);margin-top:5px}
+nav{display:flex;gap:8px;overflow:auto;margin-top:15px}nav button{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;white-space:nowrap}nav button.active{background:var(--red);border-color:var(--red)}
+main{max-width:1250px;margin:auto;padding:18px}.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:rgba(13,27,42,.94);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 28px #0003}.card h2,.card h3{margin-top:0}
+.hero{background:linear-gradient(120deg,#172d45,#102136);border:1px solid #31516f;border-radius:18px;padding:18px;margin-bottom:16px}.hero strong{color:#38e0ae}
+.stat{font-size:28px;font-weight:800}.muted{color:var(--muted)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#1d3349;color:#dce8f4;font-size:12px;margin:2px}.push{border-left:5px solid var(--red)}.pull{border-left:5px solid var(--blue)}.legs{border-left:5px solid var(--green)}
+.daygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.day{padding:11px 7px;border-radius:12px;background:#10263b;border:1px solid var(--line);min-height:105px}.day b{display:block}.day small{color:var(--muted)}.day.push{background:#35171d}.day.pull{background:#112b42}.day.legs{background:#103225}.day.cardio{background:#11303c}.day.rest{background:#222c36}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:#c7d5e3}
+input,select,textarea{width:100%;background:#081522;color:var(--text);border:1px solid #35506a;border-radius:10px;padding:10px}label{display:block;color:#c7d5e3;font-size:13px;margin-bottom:6px}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.btn{border:0;border-radius:11px;padding:10px 14px;background:#1e3850;color:white}.btn.primary{background:var(--red)}.btn.blue{background:var(--blue)}.btn.green{background:var(--green);color:#04160f}.btn.danger{background:#8d2430}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.exercise{margin-top:12px}.exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.sets{display:grid;grid-template-columns:45px 1fr 1fr 1fr 70px;gap:6px;align-items:center;margin-top:7px}.sets>div{color:var(--muted);font-size:13px}.sets input{padding:8px}.done{width:25px;height:25px}
+.timer{font-size:38px;font-weight:800;text-align:center;margin:8px}.timer-controls{display:flex;justify-content:center;gap:7px}
+.list{display:flex;flex-direction:column;gap:8px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#102237;border:1px solid var(--line);padding:11px;border-radius:12px}
+canvas{width:100%;height:250px;background:#081522;border-radius:12px;border:1px solid var(--line)}
+.note{font-size:13px;color:var(--muted);line-height:1.5}
+@media(max-width:700px){header{position:static}.daygrid{grid-template-columns:repeat(2,1fr)}.sets{grid-template-columns:35px 1fr 1fr 1fr 45px;font-size:12px}.sets input{min-width:0;padding:7px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏋️ Sport Tracker — PPL 12 semaines</h1>
+  <div class="sub">Programme 120 kg → 90 kg • 3 séances musculation • suivi local</div>
+  <nav>
+    <button class="active" data-view="dashboard">Tableau de bord</button>
+    <button data-view="session">Séance</button>
+    <button data-view="history">Historique</button>
+    <button data-view="progress">Progression</button>
+    <button data-view="program">Programme</button>
+    <button data-view="settings">Données</button>
+  </nav>
+</header>
+
+<main>
+<section id="dashboard" class="view active">
+  <div class="hero">
+    <h2>Ton cycle de 12 semaines</h2>
+    <p>Objectif du programme : <strong>perte de poids progressive, maintien/construction musculaire, condition physique, mobilité et explosivité.</strong></p>
+    <div class="formgrid">
+      <div><label>Poids actuel (kg)</label><input id="weightNow" type="number" step=".1"></div>
+      <div><label>Semaine du cycle</label><input id="weekNow" type="number" min="1" max="12"></div>
+      <div><label>Objectif poids (kg)</label><input id="weightGoal" type="number" step=".1" value="90"></div>
+    </div>
+    <div class="actions"><button class="btn primary" onclick="saveProfile()">Enregistrer</button></div>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>Poids</h3><div class="stat" id="dashWeight">—</div><div class="muted">objectif 90 kg</div></div>
+    <div class="card"><h3>Séances enregistrées</h3><div class="stat" id="dashSessions">0</div><div class="muted">dans ta base locale</div></div>
+    <div class="card"><h3>Séries enregistrées</h3><div class="stat" id="dashSets">0</div><div class="muted">tous exercices</div></div>
+    <div class="card"><h3>Volume total</h3><div class="stat" id="dashVolume">0 kg</div><div class="muted">charge × répétitions</div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><h2>Planning hebdomadaire</h2><div class="daygrid">
+    <div class="day push"><b>Lundi</b><small>Push + mobilité</small><p>Développé couché<br>Incliné<br>Épaules<br>Triceps</p></div>
+    <div class="day cardio"><b>Mardi</b><small>Cardio + motricité</small><p>30–60 min selon phase<br>+ 10–15 min mobilité</p></div>
+    <div class="day pull"><b>Mercredi</b><small>Pull</small><p>Tirage vertical<br>Rowing<br>Biceps<br>Face pull</p></div>
+    <div class="day rest"><b>Jeudi</b><small>Repos / marche</small><p>Marche ou repos actif</p></div>
+    <div class="day legs"><b>Vendredi</b><small>Legs + explosivité</small><p>Presse<br>RDL<br>Leg curl<br>Mollets</p></div>
+    <div class="day cardio"><b>Samedi</b><small>Cardio</small><p>35–60 min selon phase<br>rythme varié</p></div>
+    <div class="day rest"><b>Dimanche</b><small>Repos</small><p>Récupération</p></div>
+  </div></div>
+</section>
+
+<section id="session" class="view">
+  <div class="card">
+    <h2>Nouvelle séance</h2>
+    <div class="formgrid">
+      <div><label>Date</label><input id="sessionDate" type="date"></div>
+      <div><label>Type</label><select id="sessionType"><option>Push</option><option>Pull</option><option>Legs</option><option>Cardio</option><option>Mobilité</option></select></div>
+      <div><label>Phase</label><select id="sessionPhase"><option value="1">Phase 1 — semaines 1 à 4</option><option value="2">Phase 2 — semaines 5 à 8</option><option value="3">Phase 3 — semaines 9 à 12</option></select></div>
+    </div>
+  </div>
+  <div id="sessionExercises"></div>
+  <div class="card" style="margin-top:12px">
+    <h3>Chronomètre de repos</h3><div class="timer" id="timer">02:00</div>
+    <div class="timer-controls"><button class="btn blue" onclick="startTimer(60)">60 s</button><button class="btn blue" onclick="startTimer(90)">90 s</button><button class="btn blue" onclick="startTimer(120)">120 s</button><button class="btn" onclick="stopTimer()">Stop</button></div>
+  </div>
+  <div class="card" style="margin-top:12px"><label>Notes de séance</label><textarea id="sessionNotes" rows="3" placeholder="Technique, fatigue, sensations..."></textarea><div class="actions"><button class="btn primary" onclick="saveSession()">💾 Enregistrer la séance</button><button class="btn" onclick="clearSessionForm()">Réinitialiser</button></div></div>
+</section>
+
+<section id="history" class="view">
+  <div class="card"><h2>Historique</h2><div class="formgrid"><div><label>Filtrer</label><select id="historyFilter" onchange="renderHistory()"><option value="">Toutes</option><option>Push</option><option>Pull</option><option>Legs</option><option>Cardio</option><option>Mobilité</option></select></div></div></div>
+  <div id="historyList" class="list" style="margin-top:12px"></div>
+</section>
+
+<section id="progress" class="view">
+  <div class="card"><h2>Progression du volume</h2><canvas id="chart"></canvas><p class="note">Le graphique utilise les séances enregistrées. Le volume est calculé uniquement pour les séries avec charge et répétitions.</p></div>
+  <div class="card" style="margin-top:12px"><h2>Meilleures performances</h2><div id="bestList"></div></div>
+</section>
+
+<section id="program" class="view">
+  <div class="hero"><h2>Programme source intégré</h2><p>Les exercices, séries × répétitions et repos ci-dessous reprennent la base des deux visuels fournis.</p></div>
+  <div class="grid">
+    <div class="card push"><h2>🔴 PUSH</h2><p class="note">Poitrine — épaules — triceps</p><div id="programPush"></div></div>
+    <div class="card pull"><h2>🔵 PULL</h2><p class="note">Dos — biceps — posture</p><div id="programPull"></div></div>
+    <div class="card legs"><h2>🟢 LEGS</h2><p class="note">Jambes — fessiers — mollets</p><div id="programLegs"></div></div>
+  </div>
+  <div class="grid" style="margin-top:14px">
+    <div class="card"><h3>Phase 1 — semaines 1 à 4</h3><p>Apprendre les mouvements, construire la base, progresser doucement. RIR 2–3. Objectif : technique + régularité.</p></div>
+    <div class="card"><h3>Phase 2 — semaines 5 à 8</h3><p>Plus de volume et d'intensité, exercices unilatéraux, progression des charges. Objectif : force + masse musculaire.</p></div>
+    <div class="card"><h3>Phase 3 — semaines 9 à 12</h3><p>Puissance, explosivité, stabilité et charges plus lourdes si possible. Objectif : athlétisme + performance.</p></div>
+  </div>
+  <div class="card" style="margin-top:14px"><h3>Règles du programme</h3><p>Échauffement 5–10 min • respecter les repos • technique propre • progression progressive des charges • écouter son corps • hydratation et sommeil.</p><p class="note">La deuxième image prévoit aussi du cardio 2×/semaine, de la marche quotidienne, de la mobilité 2–3×/semaine et une semaine de deload toutes les 4 semaines (-20 à 30 % de volume).</p></div>
+</section>
+
+<section id="settings" class="view">
+  <div class="card"><h2>Données locales</h2><p>Tout est stocké dans le navigateur via <b>localStorage</b>. Rien n'est envoyé à un serveur.</p><div class="actions"><button class="btn blue" onclick="exportData()">Exporter mes données (.json)</button><label class="btn" style="display:inline-block">Importer .json<input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)"></label><button class="btn danger" onclick="resetData()">Effacer toutes les données</button></div></div>
+</section>
+</main>
+
+<script>
+const PROGRAM={
+Push:[
+["Développé couché","3 × 6–10","120–180 s"],["Développé incliné haltères","3 × 8–12","90–120 s"],["Développé épaules","3 × 8–12","90–120 s"],["Élévations latérales","3 × 12–20","60–90 s"],["Extension triceps poulie","3 × 10–15","60–90 s"],["Dips (ou machine)","3 × 8–12","90–120 s"],["Extension triceps au-dessus de la tête","2–3 × 10–15","60–90 s"],["Face Pull (optionnel)","2–3 × 12–20","60–90 s"]],
+Pull:[
+["Tirage vertical (larges ou neutres)","3 × 8–12","90–120 s"],["Rowing assis poulie","3 × 8–12","90–120 s"],["Rowing unilatéral","2 × 10–12","60–90 s"],["Face Pull","3 × 12–20","60–90 s"],["Curl biceps","3 × 10–15","60–90 s"],["Curl marteau","2–3 × 10–15","60–90 s"],["Oiseau / reverse fly","2–3 × 12–20","60–90 s"],["Farmer walk","3 × 30–45 s","90–120 s"]],
+Legs:[
+["Presse à cuisses","3 × 8–12","90–120 s"],["Soulevé de terre roumain","3 × 8–10","90–120 s"],["Leg curl","3 × 10–15","60–90 s"],["Split squat bulgare","2 × 8–10 / jambe","90–120 s"],["Extension de jambe","3 × 10–15","60–90 s"],["Mollets debout","4 × 12–20","45–60 s"],["Gainage","3 × 30–60 s","45–60 s"],["Sauts / puissance","3 × 5 (ou 30 s)","60–90 s"]]
+};
+let db=JSON.parse(localStorage.getItem("sportTrackerDB")||'{"profile":{"weight":120,"goal":90,"week":1},"sessions":[]}');
+let timerInterval=null,timerEnd=0;
+
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.getElementById(b.dataset.view).classList.add("active");if(b.dataset.view==="progress")renderProgress();if(b.dataset.view==="history")renderHistory();});
+
+function persist(){localStorage.setItem("sportTrackerDB",JSON.stringify(db));updateDash();}
+function saveProfile(){db.profile.weight=+document.getElementById("weightNow").value||db.profile.weight;db.profile.goal=+document.getElementById("weightGoal").value||90;db.profile.week=Math.min(12,Math.max(1,+document.getElementById("weekNow").value||1));persist();alert("Profil enregistré.");}
+function updateDash(){document.getElementById("dashWeight").textContent=(db.profile.weight??"—")+" kg";document.getElementById("dashSessions").textContent=db.sessions.length;let sets=0,vol=0;db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.done)sets++;if(x.charge&&x.reps)vol+=+x.charge*+x.reps})));document.getElementById("dashSets").textContent=sets;document.getElementById("dashVolume").textContent=Math.round(vol)+" kg";document.getElementById("weightNow").value=db.profile.weight;document.getElementById("weekNow").value=db.profile.week;document.getElementById("weightGoal").value=db.profile.goal;}
+function renderSession(){let type=document.getElementById("sessionType").value;let arr=PROGRAM[type]||[];document.getElementById("sessionExercises").innerHTML=arr.map((e,i)=>`<div class="card exercise"><div class="exercise-head"><div><h3>${e[0]}</h3><span class="badge">${e[1]}</span><span class="badge">Repos ${e[2]}</span></div></div><div class="sets"><div>Série</div><div>Charge kg</div><div>Reps</div><div>Repos s</div><div>OK</div>${Array.from({length:parseInt(e[1])||3},(_,j)=>`<div>${j+1}</div><input data-ex="${i}" data-field="charge" type="number" step=".5"><input data-ex="${i}" data-field="reps" type="number" min="0"><input data-ex="${i}" data-field="rest" type="number" placeholder="90"><input data-ex="${i}" data-field="done" class="done" type="checkbox">`).join("")}</div></div>`).join("");}
+document.getElementById("sessionType").onchange=renderSession;
+function saveSession(){let type=document.getElementById("sessionType").value;let groups={};document.querySelectorAll("[data-ex]").forEach(el=>{let i=el.dataset.ex;groups[i]??=[];let j=Math.floor(groups[i].length);if(el.dataset.field==="charge"){} });let exercises=PROGRAM[type].map((e,i)=>{let inputs=[...document.querySelectorAll(`[data-ex="${i}"]`)];let rows=[];for(let j=0;j<inputs.length;j+=4){let a=inputs.slice(j,j+4);rows.push({charge:+a[0].value||0,reps:+a[1].value||0,rest:+a[2].value||0,done:a[3].checked})}return{name:e[0],target:e[1],restTarget:e[2],sets:rows}});db.sessions.push({id:Date.now(),date:document.getElementById("sessionDate").value||today(),type,phase:+document.getElementById("sessionPhase").value,notes:document.getElementById("sessionNotes").value,exercises});persist();alert("Séance enregistrée.");renderHistory();renderProgress();}
+function today(){return new Date().toISOString().slice(0,10)}
+function clearSessionForm(){document.getElementById("sessionNotes").value="";renderSession();}
+function renderHistory(){let f=document.getElementById("historyFilter").value;let arr=db.sessions.filter(s=>!f||s.type===f).slice().reverse();document.getElementById("historyList").innerHTML=arr.length?arr.map(s=>`<div class="card"><div class="row"><div><b>${s.date} — ${s.type}</b><div class="muted">Phase ${s.phase} • ${s.exercises.length} exercices</div></div><button class="btn danger" onclick="deleteSession(${s.id})">Supprimer</button></div><details style="margin-top:10px"><summary>Détail</summary>${s.exercises.map(e=>`<p><b>${e.name}</b> — ${e.sets.filter(x=>x.done||x.charge||x.reps).map(x=>`${x.charge||"—"} kg × ${x.reps||"—"} reps`).join(" | ")||"aucune série renseignée"}</p>`).join("")}<p class="note">${s.notes||""}</p></details></div>`).join(""):"<div class='card'>Aucune séance enregistrée.</div>";}
+function deleteSession(id){if(confirm("Supprimer cette séance ?")){db.sessions=db.sessions.filter(s=>s.id!==id);persist();renderHistory();renderProgress();}}
+function renderProgress(){let canvas=document.getElementById("chart"),ctx=canvas.getContext("2d"),w=canvas.width=canvas.clientWidth*2,h=canvas.height=canvas.clientHeight*2;ctx.clearRect(0,0,w,h);let vals=db.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(s=>{let v=0;s.exercises.forEach(e=>e.sets.forEach(x=>v+=(x.charge||0)*(x.reps||0)));return{date:s.date,v}});let max=Math.max(1,...vals.map(x=>x.v));ctx.strokeStyle="#31516f";ctx.lineWidth=2;for(let i=1;i<5;i++){let y=h*i/5;ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(w-15,y);ctx.stroke()}ctx.strokeStyle="#18b77a";ctx.lineWidth=5;ctx.beginPath();vals.forEach((p,i)=>{let x=35+i*Math.max(1,(w-60)/Math.max(1,vals.length-1)),y=h-25-(p.v/max)*(h-55);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();document.getElementById("bestList").innerHTML=bestPerformances();}
+function bestPerformances(){let best={};db.sessions.forEach(s=>s.exercises.forEach(e=>e.sets.forEach(x=>{if(x.charge&&x.reps){best[e.name]??={charge:0,reps:0,volume:0};best[e.name].charge=Math.max(best[e.name].charge,+x.charge);best[e.name].reps=Math.max(best[e.name].reps,+x.reps);best[e.name].volume=Math.max(best[e.name].volume,+x.charge*+x.reps)}})));return Object.keys(best).length?Object.entries(best).map(([n,v])=>`<div class="row"><b>${n}</b><span>${v.charge} kg max • ${v.reps} reps max • ${v.volume} kg de volume sur une série</span></div>`).join(""):"<p class='muted'>Enregistre des séries pour voir tes meilleures performances.</p>";}
+function renderProgram(){for(let t of ["Push","Pull","Legs"])document.getElementById("program"+t).innerHTML=PROGRAM[t].map(e=>`<div class="row"><span><b>${e[0]}</b><br><span class="muted">${e[1]}</span></span><span class="badge">${e[2]}</span></div>`).join("");}
+function startTimer(sec){stopTimer();timerEnd=Date.now()+sec*1000;timerInterval=setInterval(()=>{let left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));document.getElementById("timer").textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");if(!left){stopTimer();navigator.vibrate?.(300);}},200);}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="sport-tracker-sauvegarde.json";a.click();URL.revokeObjectURL(a.href);}
+function importData(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(x.sessions&&x.profile){db=x;persist();renderHistory();renderProgress();alert("Import réussi.")}else alert("Fichier invalide.")}catch(e){alert("Impossible de lire le fichier.")}};r.readAsText(f)}
+function resetData(){if(confirm("Effacer toutes les séances et données ?")){db={profile:{weight:120,goal:90,week:1},sessions:[]};persist();renderHistory();renderProgress();}}
+document.getElementById("sessionDate").value=today();renderSession();renderProgram();updateDash();
+</script>
+</body>
+</html>
