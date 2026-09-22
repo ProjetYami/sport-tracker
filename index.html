@@ -5,40 +5,176 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sport Tracker — PPL 12 semaines</title>
 <style>
-:root{--bg:#07111d;--panel:#0d1b2a;--panel2:#12253a;--text:#f5f7fa;--muted:#aab8c7;--red:#ef3340;--blue:#1597e5;--green:#18b77a;--purple:#7c5cff;--line:#294057;--white:#fff}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#06101b,#0b1d30);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-header{padding:22px 18px 12px;position:sticky;top:0;z-index:10;background:rgba(7,17,29,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-h1{margin:0;font-size:25px}.sub{color:var(--muted);margin-top:5px}
-nav{display:flex;gap:8px;overflow:auto;margin-top:15px}nav button{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:12px;white-space:nowrap}nav button.active{background:var(--red);border-color:var(--red)}
-main{max-width:1250px;margin:auto;padding:18px}.view{display:none}.view.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:rgba(13,27,42,.94);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 28px #0003}.card h2,.card h3{margin-top:0}
-.hero{background:linear-gradient(120deg,#172d45,#102136);border:1px solid #31516f;border-radius:18px;padding:18px;margin-bottom:16px}.hero strong{color:#38e0ae}
-.stat{font-size:28px;font-weight:800}.muted{color:var(--muted)}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#1d3349;color:#dce8f4;font-size:12px;margin:2px}.push{border-left:5px solid var(--red)}.pull{border-left:5px solid var(--blue)}.legs{border-left:5px solid var(--green)}
-.daygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.day{padding:11px 7px;border-radius:12px;background:#10263b;border:1px solid var(--line);min-height:105px}.day b{display:block}.day small{color:var(--muted)}.day.push{background:#35171d}.day.pull{background:#112b42}.day.legs{background:#103225}.day.cardio{background:#11303c}.day.rest{background:#222c36}
-table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:#c7d5e3}
-input,select,textarea{width:100%;background:#081522;color:var(--text);border:1px solid #35506a;border-radius:10px;padding:10px}label{display:block;color:#c7d5e3;font-size:13px;margin-bottom:6px}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.btn{border:0;border-radius:11px;padding:10px 14px;background:#1e3850;color:white}.btn.primary{background:var(--red)}.btn.blue{background:var(--blue)}.btn.green{background:var(--green);color:#04160f}.btn.danger{background:#8d2430}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.exercise{margin-top:12px}.exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.sets{display:grid;grid-template-columns:45px 1fr 1fr 1fr 70px;gap:6px;align-items:center;margin-top:7px}.sets>div{color:var(--muted);font-size:13px}.sets input{padding:8px}.done{width:25px;height:25px}
-.timer{font-size:38px;font-weight:800;text-align:center;margin:8px}.timer-controls{display:flex;justify-content:center;gap:7px}
-.list{display:flex;flex-direction:column;gap:8px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#102237;border:1px solid var(--line);padding:11px;border-radius:12px}
-canvas{width:100%;height:250px;background:#081522;border-radius:12px;border:1px solid var(--line)}
-.note{font-size:13px;color:var(--muted);line-height:1.5}
-@media(max-width:700px){header{position:static}.daygrid{grid-template-columns:repeat(2,1fr)}.sets{grid-template-columns:35px 1fr 1fr 1fr 45px;font-size:12px}.sets input{min-width:0;padding:7px}h1{font-size:21px}}
+:root{
+  --bg:#f4f8f7;
+  --surface:#ffffff;
+  --surface-soft:#eef6f4;
+  --text:#17252b;
+  --muted:#6d7d83;
+  --line:#dce9e6;
+  --primary:#18a999;
+  --primary-dark:#087f73;
+  --blue:#3688e8;
+  --red:#ef6670;
+  --green:#38b878;
+  --purple:#8067df;
+  --shadow:0 10px 30px rgba(29,67,63,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  padding-bottom:86px;
+  background:linear-gradient(180deg,#f7fbfa 0%,#eef6f4 100%);
+  color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:15px;
+  line-height:1.45;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+header{
+  position:sticky;top:0;z-index:20;
+  padding:18px 16px 14px;
+  background:rgba(247,251,250,.94);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(220,233,230,.9);
+}
+h1{margin:0;font-size:22px;letter-spacing:-.4px}
+.sub{margin-top:3px;color:var(--muted);font-size:13px}
+nav{
+  position:fixed;left:10px;right:10px;bottom:10px;z-index:50;
+  display:grid;grid-template-columns:repeat(6,1fr);gap:5px;
+  padding:7px;
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:0 14px 35px rgba(23,50,48,.16);
+  backdrop-filter:blur(18px);
+}
+nav button{
+  min-width:0;
+  border:0;
+  border-radius:15px;
+  padding:8px 3px 7px;
+  background:transparent;
+  color:#718087;
+  font-size:10px;
+  font-weight:700;
+}
+nav button::first-letter{font-size:16px}
+nav button.active{
+  background:#e0f5f1;
+  color:var(--primary-dark);
+}
+main{width:100%;max-width:560px;margin:auto;padding:14px 14px 20px}
+.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:15px;
+  box-shadow:var(--shadow);
+}
+.card h2{font-size:18px;letter-spacing:-.2px}
+.card h3{font-size:15px;margin-top:0}
+.hero{
+  background:linear-gradient(135deg,#e3f7f2 0%,#f7fbfa 65%);
+  border:1px solid #cbe9e3;
+  border-radius:22px;
+  padding:17px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
+}
+.hero strong{color:var(--primary-dark)}
+.stat{font-size:25px;font-weight:850;letter-spacing:-.8px}
+.muted,.note{color:var(--muted)}
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  margin:2px 2px 2px 0;
+  border-radius:999px;
+  background:#eef5f4;
+  color:#53676d;
+  font-size:11px;
+  font-weight:700;
+}
+.push{border-left:4px solid var(--red)}
+.pull{border-left:4px solid var(--blue)}
+.legs{border-left:4px solid var(--green)}
+.daygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.day{
+  min-height:102px;
+  padding:12px;
+  border-radius:15px;
+  background:#f4f8f7;
+  border:1px solid var(--line);
+}
+.day b{display:block;font-size:13px}.day small{color:var(--muted);font-size:11px}
+.day p{font-size:12px;margin-bottom:0;color:#506169}
+.day.push{background:#fff2f3}.day.pull{background:#edf5ff}.day.legs{background:#effaf3}.day.cardio{background:#edf9f8}.day.rest{background:#f2f4f5}
+table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;color:#52646a;font-size:12px;font-weight:700;margin:0 0 5px}
+input,select,textarea{
+  width:100%;color:var(--text);background:#f8fbfa;
+  border:1px solid #d6e5e2;border-radius:12px;padding:11px 10px;
+  outline:none;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{border-color:#8acfc5;box-shadow:0 0 0 3px rgba(24,169,153,.10)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{
+  border:0;border-radius:12px;padding:10px 13px;
+  background:#eaf1f0;color:#40545a;font-weight:750;
+}
+.btn.primary{background:var(--primary);color:white}
+.btn.blue{background:#e9f2ff;color:#2166ae}
+.btn.green{background:#e5f7ee;color:#178355}
+.btn.danger{background:#fff0f1;color:#c6454e}
+.exercise{margin-top:10px}
+.exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.exercise h3{margin:0 0 5px;font-size:14px}
+.sets{
+  display:grid;
+  grid-template-columns:30px 1fr 1fr 1fr 34px;
+  gap:6px;align-items:center;margin-top:9px;
+}
+.sets>div{color:var(--muted);font-size:10px;font-weight:700}
+.sets input{padding:8px;font-size:13px}
+.done{width:24px;height:24px;accent-color:var(--primary)}
+.timer{
+  font-size:42px;line-height:1;
+  font-weight:850;text-align:center;margin:12px 0;
+  font-variant-numeric:tabular-nums;color:var(--primary-dark);
+}
+.timer-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.timer-controls .btn:last-child{grid-column:1/-1}
+.list{display:flex;flex-direction:column;gap:9px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f7faf9;border:1px solid var(--line);padding:11px;border-radius:13px}
+canvas{width:100%;height:240px;background:#f7fbfa;border-radius:14px;border:1px solid var(--line)}
+details{color:#53656b}summary{cursor:pointer;font-weight:700}
+#historyList .card{box-shadow:none}
+#programPush .row,#programPull .row,#programLegs .row{background:#fbfdfc}
+@media(max-width:380px){
+  .grid,.formgrid{grid-template-columns:1fr}
+  nav button{font-size:9px}
+  .sets{grid-template-columns:25px 1fr 1fr 1fr 30px}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>🏋️ Sport Tracker — PPL 12 semaines</h1>
-  <div class="sub">Programme 120 kg → 90 kg • 3 séances musculation • suivi local</div>
-  <nav>
-    <button class="active" data-view="dashboard">Tableau de bord</button>
-    <button data-view="session">Séance</button>
-    <button data-view="history">Historique</button>
-    <button data-view="progress">Progression</button>
-    <button data-view="program">Programme</button>
-    <button data-view="settings">Données</button>
+  <h1>🏋️ Sport Tracker</h1>
+  <div class="sub">PPL 12 semaines • 120 kg → 90 kg • tes données restent sur ton appareil</div>
+  <nav aria-label="Navigation principale">
+    <button class="active" data-view="dashboard">🏠<br>Accueil</button>
+    <button data-view="session">🏋️<br>Séance</button>
+    <button data-view="history">🗓️<br>Historique</button>
+    <button data-view="progress">📈<br>Progrès</button>
+    <button data-view="program">📋<br>Programme</button>
+    <button data-view="settings">⚙️<br>Données</button>
   </nav>
 </header>
 
@@ -73,7 +209,7 @@ canvas{width:100%;height:250px;background:#081522;border-radius:12px;border:1px 
 
 <section id="session" class="view">
   <div class="card">
-    <h2>Nouvelle séance</h2>
+    <h2>Nouvelle séance</h2><p class="note" style="margin-top:-7px">Enregistre chaque série pour construire ton historique.</p>
     <div class="formgrid">
       <div><label>Date</label><input id="sessionDate" type="date"></div>
       <div><label>Type</label><select id="sessionType"><option>Push</option><option>Pull</option><option>Legs</option><option>Cardio</option><option>Mobilité</option></select></div>
