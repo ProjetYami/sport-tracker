@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYSTEM — Quêtes</title>
+<style>
+body{margin:0;padding:20px;background:#02030a;color:#fff;font-family:sans-serif;padding-bottom:40px}
+.card{background:#0a1020;border:1px solid #1a2544;border-radius:16px;padding:16px;margin-bottom:16px}
+h2{font-size:14px;margin:0 0 14px;letter-spacing:2px;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+h2 .xp{font-size:10px;color:#4df0ff;padding:3px 10px;border-radius:99px;
+  background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);letter-spacing:0}
+.info{text-align:center;margin-top:12px;font-size:13px;color:#6b7ba8}
+.info b{color:#4df0ff}
+
+/* VERRES */
+.glasses{display:flex;gap:5px;justify-content:center}
+.glass{flex:1;max-width:44px;height:50px;border:2px solid #4a9eff;border-radius:6px;
+  background:rgba(0,0,0,0.3);cursor:pointer;position:relative;overflow:hidden}
+.glass .fill{position:absolute;bottom:0;left:0;right:0;height:0;background:#4a9eff;transition:height .3s}
+.glass.filled .fill{height:100%}
+.glass.filled{border-color:#7ab8ff}
+
+/* PAS */
+.steps-row{display:flex;gap:8px;margin-top:8px}
+.steps-row input{flex:1;padding:12px;text-align:center;font-size:18px;font-weight:900;
+  color:#4df0ff;background:rgba(0,0,0,0.4);border:1px solid #1a2544;border-radius:12px}
+.steps-row button{padding:0 20px;border-radius:12px;border:0;
+  background:linear-gradient(135deg,#00e5ff,#0080ff);color:#001a2a;font-weight:900}
+
+/* CHECK */
+.check{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;
+  background:rgba(0,0,0,0.25);border:1px solid #1a2544;cursor:pointer;margin-bottom:10px}
+.check:last-child{margin-bottom:0}
+.check .box{width:26px;height:26px;min-width:26px;border-radius:8px;border:2px solid #4a5a80;
+  display:flex;align-items:center;justify-content:center;font-size:15px;color:transparent}
+.check.done .box{background:linear-gradient(135deg,#00e5ff,#0080ff);border-color:#00e5ff;color:#001a2a}
+.check .txt{flex:1;font-size:13px}
+.check.done .txt{color:#6b7ba8;text-decoration:line-through}
+.check .xp{font-size:10px;color:#4df0ff;padding:3px 10px;border-radius:99px;
+  background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);white-space:nowrap}
+
+/* DÉFI DU JOUR */
+.defi{background:linear-gradient(145deg,rgba(60,20,90,0.5),rgba(30,10,60,0.6));
+  border:1px solid rgba(168,85,247,0.4);border-radius:16px;padding:16px;margin-bottom:16px}
+.defi h2{color:#c084fc;margin-bottom:10px}
+.defi .txt{font-size:15px;font-weight:700;margin-bottom:12px;line-height:1.4}
+.defi .btn{padding:10px 18px;border-radius:10px;border:0;
+  background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;font-weight:900;
+  font-size:12px;cursor:pointer;letter-spacing:1px}
+.defi .btn:disabled{background:rgba(34,211,168,0.3);color:#22d3a8;cursor:default}
+
+/* BADGES */
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.badge{text-align:center;padding:10px 6px;border-radius:14px;
+  background:#0a1020;border:1px solid #1a2544}
+.badge.unlocked{border-color:rgba(255,200,87,0.5);background:rgba(60,40,10,0.4)}
+.badge.locked{opacity:.35;filter:grayscale(1)}
+.badge .ic{font-size:24px;margin-bottom:4px}
+.badge.unlocked .ic{color:#ffc857}
+.badge .name{font-size:9px;font-weight:900;color:#fff}
+.badge .desc{font-size:8px;color:#4a5a80;margin-top:2px;line-height:1.2}
+
+/* STREAK */
+.streak{display:flex;align-items:center;gap:12px;padding:14px;
+  background:linear-gradient(135deg,rgba(255,80,40,0.15),rgba(255,180,0,0.1));
+  border:1px solid rgba(255,150,60,0.4);border-radius:16px;margin-bottom:16px}
+.streak .flame{font-size:38px}
+.streak .info2{flex:1}
+.streak .num{font-size:32px;font-weight:900;line-height:1;color:#ff8a4a}
+.streak .lbl{font-size:10px;color:#6b7ba8;letter-spacing:1.5px;font-weight:800;text-transform:uppercase}
+.streak .sub{font-size:9px;color:#4a5a80;margin-top:2px}
+
+/* TOAST */
+.toast{position:fixed;left:50%;bottom:40px;transform:translate(-50%,20px);
+  opacity:0;background:rgba(0,40,60,0.95);border:1px solid rgba(0,229,255,0.4);
+  padding:12px 18px;border-radius:14px;font-weight:800;font-size:12px;
+  transition:.3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<!-- STREAK -->
+<div class="streak">
+  <div class="flame" id="streakFlame">🔥</div>
+  <div class="info2">
+    <div class="num" id="streakNum">0</div>
+    <div class="lbl">Jours consécutifs</div>
+    <div class="sub" id="streakSub">Valide 3 quêtes</div>
+  </div>
+</div>
+
+<!-- DÉFI DU JOUR -->
+<div class="defi">
+  <h2>🎲 QUÊTE DU SYSTÈME</h2>
+  <div class="txt" id="defiText">Chargement...</div>
+  <button class="btn" id="defiBtn" onclick="completeDefi()">✓ VALIDER</button>
+</div>
+
+<!-- EAU -->
+<div class="card">
+  <h2>💧 HYDRATATION <span class="xp">+50 XP</span></h2>
+  <div class="glasses" id="glasses"></div>
+  <div class="info">Objectif : <b><span id="count">0</span> / 8 verres × 500ml</b> (<span id="liters">0.0</span> L)</div>
+</div>
+
+<!-- PAS -->
+<div class="card">
+  <h2>👣 MARCHE <span class="xp">+100 XP</span></h2>
+  <div class="info" style="text-align:left;margin:0 0 6px">Objectif : <b>8 000 pas</b></div>
+  <div class="steps-row">
+    <input type="number" id="stepsInput" placeholder="0" step="100">
+    <button onclick="saveSteps()">OK</button>
+  </div>
+  <div class="info" id="stepsInfo" style="margin-top:8px">0 pas enregistrés</div>
+</div>
+
+<!-- MOBILITÉ -->
+<div class="check" id="mob" onclick="toggleQuest('mobility',50,'🧘 Mobilité')">
+  <div class="box">✓</div>
+  <div class="txt">🧘 10 min de mobilité</div>
+  <div class="xp">+50 XP</div>
+</div>
+
+<!-- SOMMEIL -->
+<div class="check" id="sleep" onclick="toggleQuest('sleep',100,'🌙 Sommeil')">
+  <div class="box">✓</div>
+  <div class="txt">🌙 Dormir 7h+</div>
+  <div class="xp">+100 XP</div>
+</div>
+
+<!-- BADGES -->
+<div class="card">
+  <h2>🏆 BADGES <span class="xp" id="badgeCount" style="color:#ffc857;border-color:rgba(255,200,87,0.4)">0 / 12</span></h2>
+  <div class="badges" id="badges"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ ÉTAT ============ */
+let state = JSON.parse(localStorage.getItem('sportState') || 'null');
+if(!state){
+  state = {
+    water: 0, steps: 0,
+    mobility: false, sleep: false,
+    defiDone: false, defiDay: null,
+    xp: 0, level: 1,
+    claimed: {},          // { water:true, steps:true, mobility:true... }
+    history: {}           // { "2025-01-15": {water:8,steps:8000,mobility:true...} }
+  };
+}
+
+const today = new Date().toISOString().slice(0,10);
+
+/* Reset quotidien */
+if(state.lastDay !== today){
+  state.lastDay = today;
+  state.water = 0;
+  state.steps = 0;
+  state.mobility = false;
+  state.sleep = false;
+  state.claimed = {};
+}
+
+function save(){ localStorage.setItem('sportState', JSON.stringify(state)); }
+
+/* ============ XP ============ */
+function addXP(n, reason){
+  state.xp += n;
+  const need = Math.round(100 + state.level ** 1.45 * 32);
+  while(state.xp >= need){
+    state.xp -= need;
+    state.level++;
+  }
+  toast(`+${n} XP • ${reason}`);
+  save();
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+/* ============ EAU ============ */
+function renderWater(){
+  document.getElementById('glasses').innerHTML = Array.from({length:8},(_,i)=>{
+    const f = i < state.water ? 'filled' : '';
+    return `<div class="glass ${f}" onclick="setWater(${i+1})"><div class="fill"></div></div>`;
+  }).join('');
+  document.getElementById('count').textContent = state.water;
+  document.getElementById('liters').textContent = (state.water * 0.5).toFixed(1);
+}
+
+function setWater(n){
+  if(n === state.water) state.water = n - 1;
+  else state.water = n;
+
+  if(state.water >= 8 && !state.claimed.water){
+    state.claimed.water = true;
+    save();
+    addXP(50, '💧 Hydratation complète');
+  } else save();
+  renderWater();
+  renderStreak();
+  checkBadges();
+}
+
+/* ============ PAS ============ */
+function saveSteps(){
+  const v = parseInt(document.getElementById('stepsInput').value) || 0;
+  state.steps = Math.max(0, v);
+
+  if(state.steps >= 8000 && !state.claimed.steps){
+    state.claimed.steps = true;
+    save();
+    addXP(100, '👣 8 000 pas');
+  } else save();
+  renderSteps();
+  renderStreak();
+  checkBadges();
+}
+
+function renderSteps(){
+  document.getElementById('stepsInput').value = state.steps || '';
+  const pct = Math.min(100, Math.round(state.steps / 8000 * 100));
+  document.getElementById('stepsInfo').innerHTML = `${state.steps} pas enregistrés • <b style="color:#4df0ff">${pct}%</b>`;
+}
+
+/* ============ CHECK SIMPLE ============ */
+function toggleQuest(key, xp, label){
+  state[key] = !state[key];
+
+  if(state[key] && !state.claimed[key]){
+    state.claimed[key] = true;
+    save();
+    addXP(xp, label);
+  } else save();
+
+  document.getElementById(key === 'mobility' ? 'mob' : 'sleep')
+    .classList.toggle('done', state[key]);
+  renderStreak();
+  checkBadges();
+}
+
+/* ============ DÉFI DU JOUR ============ */
+const DEFIS = [
+  {t:"Fais 20 pompes en 1 série", xp:150},
+  {t:"Bois 500ml d'eau cul sec", xp:150},
+  {t:"3 minutes de gainage", xp:150},
+  {t:"Marche 15 min sans t'asseoir", xp:150},
+  {t:"50 squats poids du corps", xp:150},
+  {t:"30 sec de planche latérale", xp:150},
+  {t:"20 burpees", xp:200},
+  {t:"15 tractions", xp:200},
+  {t:"50 jumping jacks", xp:150},
+  {t:"100 sauts sur place", xp:150},
+  {t:"20 min de marche d'affilée", xp:200},
+  {t:"Tiens une planche 60 secondes", xp:200}
+];
+
+function getDefi(){
+  const seed = parseInt(today.replace(/-/g,''));
+  return DEFIS[seed % DEFIS.length];
+}
+
+function renderDefi(){
+  const d = getDefi();
+  document.getElementById('defiText').textContent = d.t;
+  const btn = document.getElementById('defiBtn');
+  if(state.defiDone && state.defiDay === today){
+    btn.textContent = '✓ ACCOMPLIE';
+    btn.disabled = true;
+  } else {
+    btn.textContent = '✓ VALIDER (+' + d.xp + ' XP)';
+    btn.disabled = false;
+  }
+}
+
+function completeDefi(){
+  if(state.defiDone && state.defiDay === today) return;
+  state.defiDone = true;
+  state.defiDay = today;
+  save();
+  const d = getDefi();
+  addXP(d.xp, '🎲 Défi du jour');
+  renderDefi();
+}
+
+/* ============ STREAK ============ */
+function renderStreak(){
+  const questsDone = [
+    state.water >= 8,
+    state.steps >= 8000,
+    state.mobility,
+    state.sleep,
+    state.defiDone
+  ].filter(Boolean).length;
+
+  // Streak basé sur les jours précédents
+  let streak = 0;
+  let ref = new Date();
+  while(true){
+    const k = ref.toISOString().slice(0,10);
+    const d = state.history[k];
+    if(!d) break;
+    const cnt = (d.water >= 8 ? 1 : 0) + (d.steps >= 8000 ? 1 : 0)
+              + (d.mobility ? 1 : 0) + (d.sleep ? 1 : 0);
+    if(cnt >= 3) streak++;
+    else break;
+    ref.setDate(ref.getDate() - 1);
+  }
+
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('streakFlame').textContent = streak >= 3 ? '🔥' : '✨';
+  document.getElementById('streakSub').textContent = questsDone + ' / 5 aujourd\'hui';
+}
+
+/* ============ BADGES ============ */
+const BADGES = [
+  {id:'hydro', ic:'💧', name:'Hydraté', desc:'7j à 8 verres'},
+  {id:'walker', ic:'👣', name:'Marcheur', desc:'10 000 pas'},
+  {id:'fire', ic:'🔥', name:'En feu', desc:'30j streak'},
+  {id:'warrior', ic:'⚔', name:'Guerrier', desc:'50 séances'},
+  {id:'legend', ic:'👑', name:'Légende', desc:'Niveau 30'},
+  {id:'transcend', ic:'🌌', name:'Transcendant', desc:'Niveau 60'},
+  {id:'boss', ic:'💪', name:'Boss', desc:'10 records'},
+  {id:'morning', ic:'🌅', name:'Matinal', desc:'10 séances tôt'},
+  {id:'perfect', ic:'🥇', name:'Sans faute', desc:'7j parfaits'},
+  {id:'hunter', ic:'🎯', name:'Chasseur', desc:'100 quêtes'},
+  {id:'titan', ic:'🏋', name:'Titan', desc:'100 séances'},
+  {id:'marathon', ic:'⏱', name:'Marathonien', desc:'10× 45min'}
+];
+
+let unlockedBadges = JSON.parse(localStorage.getItem('badges') || '[]');
+
+function checkBadges(){
+  // Rien à débloquer pour l'instant (système simplifié)
+  // On garde la structure pour plus tard
+}
+
+function renderBadges(){
+  document.getElementById('badgeCount').textContent = unlockedBadges.length + ' / 12';
+  document.getElementById('badges').innerHTML = BADGES.map(b=>{
+    const un = unlockedBadges.includes(b.id);
+    return `<div class="badge ${un?'unlocked':'locked'}">
+      <div class="ic">${b.ic}</div>
+      <div class="name">${b.name}</div>
+      <div class="desc">${b.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ ENREGISTRE HISTORIQUE ============ */
+function saveHistory(){
+  state.history[today] = {
+    water: state.water,
+    steps: state.steps,
+    mobility: state.mobility,
+    sleep: state.sleep,
+    defiDone: state.defiDone
+  };
+  save();
+}
+setInterval(saveHistory, 10000);
+window.addEventListener('beforeunload', saveHistory);
+
+/* ============ INIT ============ */
+renderWater();
+renderSteps();
+renderDefi();
+renderStreak();
+renderBadges();
+document.getElementById('mob').classList.toggle('done', state.mobility);
+document.getElementById('sleep').classList.toggle('done', state.sleep);
+</script>
+</body>
+</html>
