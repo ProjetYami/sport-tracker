@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test</title>
+<style>
+body{background:#02030a;color:#fff;font-family:sans-serif;padding:20px;margin:0}
+.card{
+  background:#0a1020;
+  border:1px solid #1a2544;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:12px;
+}
+.bottles{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.bottle{
+  position:relative;
+  height:70px;
+  border:2px solid #4a9eff;
+  border-radius:12px;
+  background:rgba(0,0,0,0.3);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+.bottle .fill{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:0%;
+  background:#4a9eff;
+}
+.bottle .num{
+  position:relative;
+  z-index:1;
+  font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>💧 Test — 8 bouteilles</h2>
+  <div class="bottles">
+    <div class="bottle"><div class="fill"></div><div class="num">1</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">2</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">3</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">4</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">5</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">6</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">7</div></div>
+    <div class="bottle"><div class="fill"></div><div class="num">8</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📦 Carte du dessous</h2>
+  <p>Si tu vois bien les 8 bouteilles dans UNE seule carte, et cette carte EN DESSOUS, alors on tient le bon bout.</p>
+</div>
+
+</body>
+</html>
