@@ -5,15 +5,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SYSTEM</title>
 <style>
-body{margin:0;padding:20px;background:#02030a;color:#fff;font-family:sans-serif}
+body{margin:0;padding:20px;background:#02030a;color:#fff;font-family:sans-serif;padding-bottom:40px}
 .card{background:#0a1020;border:1px solid #1a2544;border-radius:16px;padding:16px;margin-bottom:16px}
-h2{font-size:14px;margin:0 0 14px;letter-spacing:2px}
-.glasses{display:flex;gap:8px;justify-content:center}
+h2{font-size:14px;margin:0 0 14px;letter-spacing:2px;text-transform:uppercase}
+.glasses{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .glass{width:40px;height:50px;border:2px solid #4a9eff;border-radius:6px;background:rgba(0,0,0,0.3);cursor:pointer;position:relative;overflow:hidden}
 .glass .fill{position:absolute;bottom:0;left:0;right:0;height:0;background:#4a9eff;transition:height .3s}
 .glass.filled .fill{height:100%}
+.glass.filled{border-color:#7ab8ff}
 .info{text-align:center;margin-top:12px;font-size:13px;color:#6b7ba8}
 .info b{color:#4df0ff}
+
+.steps-row{display:flex;gap:8px;margin-top:8px}
+.steps-row input{flex:1;padding:12px;text-align:center;font-size:18px;font-weight:900;
+  color:#4df0ff;background:rgba(0,0,0,0.4);border:1px solid #1a2544;border-radius:12px}
+.steps-row button{padding:0 20px;border-radius:12px;border:0;
+  background:linear-gradient(135deg,#00e5ff,#0080ff);color:#001a2a;font-weight:900}
+
+.check{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;
+  background:#0a1020;border:1px solid #1a2544;cursor:pointer}
+.check .box{width:26px;height:26px;border-radius:8px;border:2px solid #4a5a80;
+  display:flex;align-items:center;justify-content:center;font-size:15px;color:transparent}
+.check.done .box{background:linear-gradient(135deg,#00e5ff,#0080ff);border-color:#00e5ff;color:#001a2a}
+.check .txt{flex:1;font-size:13px}
+.check.done .txt{color:#6b7ba8;text-decoration:line-through}
 </style>
 </head>
 <body>
@@ -21,37 +36,80 @@ h2{font-size:14px;margin:0 0 14px;letter-spacing:2px}
 <div class="card">
   <h2>💧 HYDRATATION</h2>
   <div class="glasses" id="glasses"></div>
-  <div class="info">Objectif : <b><span id="count">0</span> / 8 verres × 500ml</b></div>
+  <div class="info">Objectif : <b><span id="count">0</span> / 8 verres × 500ml</b> (<span id="liters">0.0</span> L)</div>
 </div>
 
 <div class="card">
   <h2>👣 MARCHE</h2>
-  <div class="info"><b>4300 / 8000 pas</b></div>
+  <div class="info" style="text-align:left;margin:0 0 6px">Objectif : <b>8 000 pas</b></div>
+  <div class="steps-row">
+    <input type="number" id="stepsInput" placeholder="0" step="100">
+    <button onclick="saveSteps()">OK</button>
+  </div>
+  <div class="info" id="stepsInfo" style="margin-top:8px">0 pas enregistrés</div>
 </div>
 
 <div class="card">
   <h2>🧘 MOBILITÉ</h2>
-  <div class="info">10 min de mobilité</div>
+  <div class="check" id="mob" onclick="toggleMob()">
+    <div class="box">✓</div>
+    <div class="txt">10 min de mobilité</div>
+  </div>
 </div>
 
 <script>
-let water = 0;
+/* ÉTAT (sauvegardé dans localStorage) */
+let state = JSON.parse(localStorage.getItem('sportState') || 'null');
+if(!state){
+  state = { water: 0, steps: 0, mobility: false };
+}
 
-function render(){
+function saveState(){
+  localStorage.setItem('sportState', JSON.stringify(state));
+}
+
+/* EAU */
+function renderWater(){
   document.getElementById('glasses').innerHTML = Array.from({length:8},(_,i)=>{
-    const f = i < water ? 'filled' : '';
+    const f = i < state.water ? 'filled' : '';
     return `<div class="glass ${f}" onclick="setWater(${i+1})"><div class="fill"></div></div>`;
   }).join('');
-  document.getElementById('count').textContent = water;
+  document.getElementById('count').textContent = state.water;
+  document.getElementById('liters').textContent = (state.water * 0.5).toFixed(1);
 }
 
 function setWater(n){
-  if(n === water) water = n - 1;
-  else water = n;
-  render();
+  if(n === state.water) state.water = n - 1;
+  else state.water = n;
+  saveState();
+  renderWater();
 }
 
-render();
+/* PAS */
+function saveSteps(){
+  const v = parseInt(document.getElementById('stepsInput').value) || 0;
+  state.steps = Math.max(0, v);
+  saveState();
+  renderSteps();
+}
+
+function renderSteps(){
+  document.getElementById('stepsInput').value = state.steps || '';
+  const pct = Math.min(100, Math.round(state.steps / 8000 * 100));
+  document.getElementById('stepsInfo').innerHTML = `${state.steps} pas enregistrés • <b>${pct}%</b>`;
+}
+
+/* MOBILITÉ */
+function toggleMob(){
+  state.mobility = !state.mobility;
+  saveState();
+  document.getElementById('mob').classList.toggle('done', state.mobility);
+}
+
+/* INIT */
+renderWater();
+renderSteps();
+document.getElementById('mob').classList.toggle('done', state.mobility);
 </script>
 </body>
 </html>
