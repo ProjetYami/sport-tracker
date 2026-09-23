@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYSTEM</title>
+<style>
+body{margin:0;padding:20px;background:#02030a;color:#fff;font-family:sans-serif}
+.card{background:#0a1020;border:1px solid #1a2544;border-radius:16px;padding:16px;margin-bottom:16px}
+h2{font-size:14px;margin:0 0 14px;letter-spacing:2px}
+.glasses{display:flex;gap:8px;justify-content:center}
+.glass{width:40px;height:50px;border:2px solid #4a9eff;border-radius:6px;background:rgba(0,0,0,0.3);cursor:pointer;position:relative;overflow:hidden}
+.glass .fill{position:absolute;bottom:0;left:0;right:0;height:0;background:#4a9eff;transition:height .3s}
+.glass.filled .fill{height:100%}
+.info{text-align:center;margin-top:12px;font-size:13px;color:#6b7ba8}
+.info b{color:#4df0ff}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>💧 HYDRATATION</h2>
+  <div class="glasses" id="glasses"></div>
+  <div class="info">Objectif : <b><span id="count">0</span> / 8 verres × 500ml</b></div>
+</div>
+
+<div class="card">
+  <h2>👣 MARCHE</h2>
+  <div class="info"><b>4300 / 8000 pas</b></div>
+</div>
+
+<div class="card">
+  <h2>🧘 MOBILITÉ</h2>
+  <div class="info">10 min de mobilité</div>
+</div>
+
+<script>
+let water = 0;
+
+function render(){
+  document.getElementById('glasses').innerHTML = Array.from({length:8},(_,i)=>{
+    const f = i < water ? 'filled' : '';
+    return `<div class="glass ${f}" onclick="setWater(${i+1})"><div class="fill"></div></div>`;
+  }).join('');
+  document.getElementById('count').textContent = water;
+}
+
+function setWater(n){
+  if(n === water) water = n - 1;
+  else water = n;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
